@@ -381,7 +381,7 @@ const handleSelectChange = (value: string) => {
                     <div>
                       <Label>Select Input</Label>
                       <input type="hidden" name="bio" value={selectedRole} />
-                      <Select id="role" name="role"
+                      <Select
                         options={options}
                         placeholder="Select Option"
                         onChange={handleSelectChange}
