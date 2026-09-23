@@ -20,8 +20,35 @@
       "pro": "pro"
     },
     "items": {
+      "forgotPassword": {
+        "title": "Forgot Password?",
+        "subtitle": "Enter your email address to receive a password reset link.",
+        "email": "Email",
+        "emailPlaceholder": "Enter your registered email",
+        "submitBtn": "Send Reset Link",
+        "submitting": "Sending Reset Link...",
+        "backToSignIn": "Back to Sign In",
+        "emailRequired": "Please enter your email address.",
+        "successMsg": "Password reset link sent! Please check your email inbox."
+      },
+      "resetPassword": {
+        "title": "Reset Password",
+        "subtitle": "Enter your new password below.",
+        "newPassword": "New Password",
+        "newPasswordPlaceholder": "Enter new password",
+        "confirmPassword": "Confirm Password",
+        "confirmPasswordPlaceholder": "Re-enter new password",
+        "submitBtn": "Reset Password",
+        "submitting": "Updating Password...",
+        "passwordsDoNotMatch": "Passwords do not match.",
+        "passwordLengthError": "Password must be at least 6 characters long.",
+        "successMsg": "Password updated successfully! Redirecting to Sign In..."
+      },
       "dashboard": "Dashboard",
       "ecommerceHome": "Ecommerce",
+      "submitted_forms": "Submitted Forms",
+      "google_analytics": "Google Analytics",
+      "news_and_announcements": "News and Announcements",
       "analytics": "Analytics",
       "marketing": "Marketing",
       "crm": "CRM",
@@ -112,7 +139,6 @@
       "authentication": "Authentication",
       "signIn": "Sign In",
       "signUp": "Sign Up",
-      "resetPassword": "Reset Password",
       "twoStepVerification": "Two Step Verification",
       "chat": "Chat",
       "supportMenu": "Support",
@@ -140,12 +166,40 @@
       "viewAll": "View All Notifications"
     }
   },
+  "signUp": {
+    "backToDashboard": "Back to dashboard",
+    "title": "Sign Up",
+    "subtitle": "Enter your email and password to sign up!",
+    "signUpGoogle": "Sign up with Google",
+    "signUpX": "Sign up with X",
+    "redirecting": "Redirecting...",
+    "or": "Or",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter your first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "termsPrefix": "By creating an account means you agree to the ",
+    "termsLink": "Terms and Conditions,",
+    "termsAnd": "and our ",
+    "privacyLink": "Privacy Policy",
+    "submitBtn": "Sign Up",
+    "submitting": "Creating Account...",
+    "alreadyHaveAccount": "Already have an account?",
+    "signInLink": "Sign In",
+    "termsError": "You must accept the Terms and Conditions to proceed.",
+    "successMsg": "Registration successful! Please check your email to confirm your account."
+  },
   "userDropdown": {
     "editProfile": "Edit profile",
     "accountSettings": "Account settings",
     "support": "Support",
     "language": "Language",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "signingOut": "Signing out..."
   },
   "ecommerce": {
     "title": "E-commerce Dashboard",

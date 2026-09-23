@@ -3,13 +3,103 @@
 import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
-import { Link } from "@/i18n/navigation";
+import Button from "@/components/ui/button/Button";
+import { Link, useRouter } from "@/i18n/navigation";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
+import { createClient } from "@/utils/supabase/client";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export default function SignUpForm() {
+  const t = useTranslations("signUp");
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  // Form states
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Status feedback states
+  const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    if (!isChecked) {
+      setErrorMsg(t("termsError", { fallback: "You must accept the Terms and Conditions to proceed." }));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const supabase = createClient();
+
+      // 1. Sign up user via Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            full_name: `${firstName} ${lastName}`.trim(),
+          },
+        },
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+        return;
+      }
+
+      // 2. Check if email confirmation is required or if a session was created immediately
+      if (data.user && data.session) {
+        router.push("/");
+        router.refresh();
+      } else {
+        setSuccessMsg(
+          t("successMsg", {
+            fallback: "Registration successful! Please check your email to confirm your account.",
+          })
+        );
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOAuthSignUp = async (provider: "google" | "twitter") => {
+    try {
+      setOauthLoading(provider);
+      setErrorMsg(null);
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+        setOauthLoading(null);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "OAuth sign up failed.");
+      setOauthLoading(null);
+    }
+  };
 
   return (
     <div className="no-scrollbar flex w-full flex-1 flex-col overflow-y-auto lg:w-1/2">
@@ -19,22 +109,27 @@ export default function SignUpForm() {
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
           <ChevronLeftIcon className="rtl:rotate-180" />
-          Back to dashboard
+          {t("backToDashboard", { fallback: "Back to dashboard" })}
         </Link>
       </div>
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 text-title-sm font-semibold text-gray-800 sm:text-title-md dark:text-white/90">
-              Sign Up
+              {t("title", { fallback: "Sign Up" })}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign up!
+              {t("subtitle", { fallback: "Enter your email and password to sign up!" })}
             </p>
           </div>
           <div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
-              <button className="inline-flex items-center justify-center gap-3 rounded-lg bg-gray-100 px-7 py-3 text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+              <button
+                type="button"
+                disabled={Boolean(oauthLoading)}
+                onClick={() => handleOAuthSignUp("google")}
+                className="inline-flex items-center justify-center gap-3 rounded-lg bg-gray-100 px-7 py-3 text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-800 disabled:opacity-50 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
+              >
                 <svg
                   width="20"
                   height="20"
@@ -59,9 +154,16 @@ export default function SignUpForm() {
                     fill="#EB4335"
                   />
                 </svg>
-                Sign up with Google
+                {oauthLoading === "google"
+                  ? t("redirecting", { fallback: "Redirecting..." })
+                  : t("signUpGoogle", { fallback: "Sign up with Google" })}
               </button>
-              <button className="inline-flex items-center justify-center gap-3 rounded-lg bg-gray-100 px-7 py-3 text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+              <button
+                type="button"
+                disabled={Boolean(oauthLoading)}
+                onClick={() => handleOAuthSignUp("twitter")}
+                className="inline-flex items-center justify-center gap-3 rounded-lg bg-gray-100 px-7 py-3 text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-800 disabled:opacity-50 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
+              >
                 <svg
                   width="21"
                   className="fill-current"
@@ -72,7 +174,9 @@ export default function SignUpForm() {
                 >
                   <path d="M15.6705 1.875H18.4272L12.4047 8.75833L19.4897 18.125H13.9422L9.59717 12.4442L4.62554 18.125H1.86721L8.30887 10.7625L1.51221 1.875H7.20054L11.128 7.0675L15.6705 1.875ZM14.703 16.475H16.2305L6.37054 3.43833H4.73137L14.703 16.475Z" />
                 </svg>
-                Sign up with X
+                {oauthLoading === "twitter"
+                  ? t("redirecting", { fallback: "Redirecting..." })
+                  : t("signUpX", { fallback: "Sign up with X" })}
               </button>
             </div>
             <div className="relative py-3 sm:py-5">
@@ -81,59 +185,96 @@ export default function SignUpForm() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="bg-white p-2 text-gray-400 sm:px-5 sm:py-2 dark:bg-gray-900">
-                  Or
+                  {t("or", { fallback: "Or" })}
                 </span>
               </div>
             </div>
-            <form>
+
+            {errorMsg && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
+                {errorMsg}
+              </div>
+            )}
+
+            {successMsg && (
+              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-600 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400">
+                {successMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSignUp}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  {/* <!-- First Name --> */}
+                  {/* First Name */}
                   <div className="sm:col-span-1">
                     <Label>
-                      First Name<span className="text-error-500">*</span>
+                      {t("firstName", { fallback: "First Name" })}
+                      <span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
                       id="fname"
                       name="fname"
-                      placeholder="Enter your first name"
+                      required
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder={t("firstNamePlaceholder", {
+                        fallback: "Enter your first name",
+                      })}
                     />
                   </div>
-                  {/* <!-- Last Name --> */}
+                  {/* Last Name */}
                   <div className="sm:col-span-1">
                     <Label>
-                      Last Name<span className="text-error-500">*</span>
+                      {t("lastName", { fallback: "Last Name" })}
+                      <span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
                       id="lname"
                       name="lname"
-                      placeholder="Enter your last name"
+                      required
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder={t("lastNamePlaceholder", {
+                        fallback: "Enter your last name",
+                      })}
                     />
                   </div>
                 </div>
-                {/* <!-- Email --> */}
+                {/* Email */}
                 <div>
                   <Label>
-                    Email<span className="text-error-500">*</span>
+                    {t("email", { fallback: "Email" })}
+                    <span className="text-error-500">*</span>
                   </Label>
                   <Input
                     type="email"
                     id="email"
                     name="email"
-                    placeholder="Enter your email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t("emailPlaceholder", {
+                      fallback: "Enter your email",
+                    })}
                   />
                 </div>
-                {/* <!-- Password --> */}
+                {/* Password */}
                 <div>
                   <Label>
-                    Password<span className="text-error-500">*</span>
+                    {t("password", { fallback: "Password" })}
+                    <span className="text-error-500">*</span>
                   </Label>
                   <div className="relative">
                     <Input
-                      placeholder="Enter your password"
+                      placeholder={t("passwordPlaceholder", {
+                        fallback: "Enter your password",
+                      })}
                       type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -147,7 +288,7 @@ export default function SignUpForm() {
                     </span>
                   </div>
                 </div>
-                {/* <!-- Checkbox --> */}
+                {/* Checkbox */}
                 <div className="flex items-center gap-3">
                   <Checkbox
                     className="h-5 w-5"
@@ -155,33 +296,39 @@ export default function SignUpForm() {
                     onChange={setIsChecked}
                   />
                   <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
-                    By creating an account means you agree to the{" "}
+                    {t("termsPrefix", { fallback: "By creating an account means you agree to the " })}
                     <span className="text-gray-800 dark:text-white/90">
-                      Terms and Conditions,
+                      {t("termsLink", { fallback: "Terms and Conditions," })}
                     </span>{" "}
-                    and our{" "}
+                    {t("termsAnd", { fallback: "and our " })}
                     <span className="text-gray-800 dark:text-white">
-                      Privacy Policy
+                      {t("privacyLink", { fallback: "Privacy Policy" })}
                     </span>
                   </p>
                 </div>
-                {/* <!-- Button --> */}
+                {/* Submit Button */}
                 <div>
-                  <button className="flex w-full items-center justify-center rounded-lg bg-brand-500 px-4 py-3 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600">
-                    Sign Up
-                  </button>
+                  <Button
+                    type="submit"
+                    className="flex w-full items-center justify-center rounded-lg bg-brand-500 px-4 py-3 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600 disabled:opacity-50"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? t("submitting", { fallback: "Creating Account..." })
+                      : t("submitBtn", { fallback: "Sign Up" })}
+                  </Button>
                 </div>
               </div>
             </form>
 
             <div className="mt-5">
               <p className="text-center text-sm font-normal text-gray-700 sm:text-start dark:text-gray-400">
-                Already have an account?{" "}
+                {t("alreadyHaveAccount", { fallback: "Already have an account?" })}{" "}
                 <Link
                   href="/signin"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
-                  Sign In
+                  {t("signInLink", { fallback: "Sign In" })}
                 </Link>
               </p>
             </div>

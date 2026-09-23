@@ -40,36 +40,46 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     key: "dashboard",
-    subItems: [{ key: "ecommerceHome", path: "/" }],
+    subItems: [{ key: "submitted_forms", path: "/" }],
+  },
+   {
+    icon: <PlugInIcon />,
+    key: "google_analytics",
+    path: "/google_analytics",
   },
   {
-    icon: <CalenderIcon />,
-    key: "calendar",
-    path: "/calendar",
-  },
-  {
-    icon: <UserCircleIcon />,
-    key: "userProfile",
-    path: "/profile",
-  },
-  {
-    key: "forms",
-    icon: <ListIcon />,
-    subItems: [{ key: "formElements", path: "/form-elements", pro: false }],
-  },
-  {
-    key: "tables",
-    icon: <TableIcon />,
-    subItems: [{ key: "basicTables", path: "/basic-tables", pro: false }],
-  },
-  {
-    key: "pages",
     icon: <PageIcon />,
-    subItems: [
-      { key: "blankPage", path: "/blank" },
-      { key: "error404", path: "/error-404" },
-    ],
+    key: "news_and_announcements",
+    path: "/news"
   },
+  // {
+  //   icon: <CalenderIcon />,
+  //   key: "calendar",
+  //   path: "/calendar",
+  // },
+  // {
+  //   icon: <UserCircleIcon />,
+  //   key: "userProfile",
+  //   path: "/profile",
+  // },
+  // {
+  //   key: "forms",
+  //   icon: <ListIcon />,
+  //   subItems: [{ key: "formElements", path: "/form-elements", pro: false }],
+  // },
+  // {
+  //   key: "tables",
+  //   icon: <TableIcon />,
+  //   subItems: [{ key: "basicTables", path: "/basic-tables", pro: false }],
+  // },
+  // {
+  //   key: "pages",
+  //   icon: <PageIcon />,
+  //   subItems: [
+  //     { key: "blankPage", path: "/blank" },
+  //     { key: "error404", path: "/error-404" },
+  //   ],
+  // },
 ];
 
 const othersItems: NavItem[] = [
@@ -346,7 +356,7 @@ const AppSidebar: React.FC = () => {
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/logo-pikawiya.png"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -355,7 +365,7 @@ const AppSidebar: React.FC = () => {
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/logo-pikawiya.png"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -365,7 +375,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/logo-pikawiya.png"
               alt="Logo"
               width={32}
               height={32}
@@ -395,7 +405,7 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(navItems, "main")}
             </div>
 
-            <div>
+            {/* <div>
               <h2
                 className={`mb-4 flex text-xs leading-5 text-gray-400 uppercase ${
                   !isExpanded && !isHovered
@@ -410,10 +420,10 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}
-            </div>
+            </div> */}
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {/* {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null} */}
       </div>
     </aside>
   );
