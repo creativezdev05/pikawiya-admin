@@ -18,8 +18,8 @@ export interface UserClaims {
   avatarUrl: string;
   email: string;
   role: string;
-  rawUserMetadata: Record<string, any>;
-  rawAppMetadata: Record<string, any>;
+  rawUserMetadata: Record<string, unknown>;
+  rawAppMetadata: Record<string, unknown>;
 }
 
 interface ProfileData {
@@ -31,7 +31,7 @@ interface ProfileData {
   bio?: string;
   role?: string;
   avatar_url?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface UserMetaCardProps {
@@ -304,10 +304,10 @@ export default function UserMetaCard({ user, profile, claims }: UserMetaCardProp
               </div>
             </div>
             <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
-              <Button size="sm" variant="outline" type="button" onClick={closeModal}>
+              <Button size="sm" variant="outline"  onClick={closeModal}>
                 Close
               </Button>
-              <Button size="sm" type="submit" disabled={isPending}>
+              <Button size="sm"  disabled={isPending}>
                 {isPending ? "Saving..." : "Save Changes"}
               </Button>
             </div>
