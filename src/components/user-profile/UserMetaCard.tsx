@@ -10,9 +10,10 @@ import Label from "../form/Label";
 import Button from "../ui/button/Button";
 import { Modal } from "../ui/modal";
 import { User } from "@supabase/supabase-js";
-import { updateUserProfile } from "@/app/actions/profile";
+import { sendProfileUpdateOtp, verifyAndSaveProfile } from "@/app/actions/profile";
 import { createClient } from "@/utils/supabase/client"; // Import browser Supabase client
-
+import { useOtpCooldown } from "@/hooks/useOtpCooldown";
+import Select from "../form/Select";
 export interface UserClaims {
   fullName: string;
   avatarUrl: string;
@@ -41,14 +42,33 @@ interface UserMetaCardProps {
 }
 
 export default function UserMetaCard({ user, profile, claims }: UserMetaCardProps) {
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [infoMsg, setInfoMsg] = useState<string | null>(null);
   const { isOpen, openModal, closeModal } = useModal();
   const [isPending, startTransition] = useTransition();
+  const [resending, setResending] = useState(false);
+  const options = [
+      { value: "manager", label: "Manager" },
+      { value: "director", label: "Director" },
+      { value: "super_admin", label: "Super Admin" },
+    ];
+
+
+const handleSelectChange = (value: string) => {
+  setSelectedRole(value);
+};
 
   const currentAvatar =
     profile?.avatar_url || claims.avatarUrl || user.user_metadata?.avatar_url || "/images/user/owner.png";
 
   const [previewAvatar, setPreviewAvatar] = useState<string>(currentAvatar);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string>(
+  profile?.role || claims.role || "manager"
+);
 
   useEffect(() => {
     setPreviewAvatar(currentAvatar);
@@ -67,45 +87,62 @@ export default function UserMetaCard({ user, profile, claims }: UserMetaCardProp
       setPreviewAvatar(URL.createObjectURL(file));
     }
   };
+// 60-second cooldown hook
+  const { cooldown, startCooldown, canResend } = useOtpCooldown(60);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Trigger initial or re-sent OTP
+  const handleSendOtp = async () => {
+    setResending(true);
+    setErrorMsg(null);
+    setInfoMsg(null);
+
+    const res = await sendProfileUpdateOtp();
+    setResending(false);
+
+    if (!res.success) {
+      setErrorMsg(res.error || "Failed to send verification code.");
+      return;
+    }
+
+    startCooldown(); // Start 60s timer
+    setShowOtpInput(true);
+    setInfoMsg("A 6-digit verification code has been sent to your email.");
+  };
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setErrorMsg(null);
+    setInfoMsg(null);
+
     const formData = new FormData(e.currentTarget);
 
-    startTransition(async () => {
-      let uploadedAvatarUrl = "";
+    // STEP 1: If OTP field is not yet shown, request OTP first
+    if (!showOtpInput) {
+      const res = await sendProfileUpdateOtp();
+      setLoading(false);
 
-      // CLIENT-SIDE UPLOAD
-      if (selectedFile) {
-        const supabase = createClient();
-        const fileExt = selectedFile.name.split(".").pop();
-        const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
-
-        // 1. Upload file directly from browser to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from("avatars")
-          .upload(filePath, selectedFile, { upsert: true });
-
-        if (uploadError) {
-          alert(`Failed to upload avatar image: ${uploadError.message}`);
-          return;
-        }
-
-        // 2. Get Public URL with cache-busting query parameter
-        const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-        uploadedAvatarUrl = `${data.publicUrl}?v=${Date.now()}`;
+      if (!res.success) {
+        setErrorMsg(res.error || "Failed to send verification code.");
+        return;
       }
 
-      // 3. Send form fields + lightweight image URL string to Server Action
-      const res = await updateUserProfile(formData, uploadedAvatarUrl);
+      setShowOtpInput(true);
+      setInfoMsg("A 6-digit verification code has been sent to your email.");
+      return;
+    }
 
-      if (res.success) {
-        setSelectedFile(null);
-        closeModal();
-      } else {
-        alert(`Failed to update profile: ${res.error}`);
-      }
-    });
+    // STEP 2: Submit form data along with the OTP code
+    const res = await verifyAndSaveProfile(formData, otpCode);
+    setLoading(false);
+
+    if (!res.success) {
+      setErrorMsg(res.error || "Failed to update profile.");
+      return;
+    }
+
+    setShowOtpInput(false);
+    setOtpCode("");
+    setInfoMsg("Profile updated successfully!");
   };
 
   return (
@@ -208,6 +245,10 @@ export default function UserMetaCard({ user, profile, claims }: UserMetaCardProp
             </p>
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col">
+            {infoMsg && <div className="text-sm text-blue-600">{infoMsg}</div>}
+            {errorMsg && <div className="text-sm text-red-600">{errorMsg}</div>}
+
+            {/* Profile Form Fields */}
             <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
               <div>
                 <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
@@ -232,6 +273,7 @@ export default function UserMetaCard({ user, profile, claims }: UserMetaCardProp
                         accept="image/*"
                         onChange={handleAvatarChange}
                         className="hidden"
+                        readOnly={showOtpInput}
                       />
                       <svg
                         width="20"
@@ -273,12 +315,12 @@ export default function UserMetaCard({ user, profile, claims }: UserMetaCardProp
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
                     <Label>First Name</Label>
-                    <Input type="text" name="firstName" defaultValue={firstName} />
+                    <Input type="text" name="firstName" defaultValue={firstName} readOnly={showOtpInput} />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Last Name</Label>
-                    <Input type="text" name="lastName" defaultValue={lastName} />
+                    <Input type="text" name="lastName" defaultValue={lastName} readOnly={showOtpInput} />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
@@ -293,22 +335,67 @@ export default function UserMetaCard({ user, profile, claims }: UserMetaCardProp
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Phone</Label>
-                    <Input type="text" name="phone" defaultValue={phone} />
+                    <Input type="text" name="phone" defaultValue={phone} readOnly={showOtpInput} />
                   </div>
 
-                  <div className="col-span-2">
-                    <Label>Bio</Label>
-                    <Input type="text" name="bio" defaultValue={bio} />
+                  <div className="col-span-2 lg:col-span-1">
+                    <div>
+                      <Label>Select Input</Label>
+                      <input type="hidden" name="bio" value={selectedRole} />
+                      <Select
+                        options={options}
+                        placeholder="Select Option"
+                        onChange={handleSelectChange}
+                        className="dark:bg-dark-900"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* OTP Field (Conditionally Rendered) */}
+            {/* OTP Input Section */}
+            {showOtpInput && (
+              <div className="space-y-2 border-t pt-4">
+                <label className="block text-sm font-medium">Email Verification Code</label>
+                <input
+                  type="text"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  placeholder="Enter 6-digit code"
+                  required
+                  maxLength={6}
+                  className="w-full rounded border p-2 text-center text-lg tracking-widest"
+                />
+
+                {/* Resend OTP button with Cooldown Timer */}
+                <div className="flex justify-between items-center text-xs text-gray-500 pt-1">
+                  <span>Didn&apos;t receive the code?</span>
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={!canResend || resending}
+                    className="text-brand-500 font-semibold hover:underline disabled:text-gray-400 disabled:no-underline disabled:cursor-not-allowed"
+                  >
+                    {resending ? "Sending..." : canResend ? "Resend Code" : `Resend in ${cooldown}s`}
+                  </button>
+                </div>
+              </div>
+            )}
+            
             <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
               <Button size="sm" variant="outline"  onClick={closeModal}>
                 Close
               </Button>
               <Button size="sm"  disabled={isPending}>
-                {isPending ? "Saving..." : "Save Changes"}
+                {loading
+                  ? showOtpInput
+                    ? "Verifying & Saving..."
+                    : "Sending OTP..."
+                  : showOtpInput
+                  ? "Verify Code & Save Changes"
+                  : "Update Profile"}
               </Button>
             </div>
           </form>
