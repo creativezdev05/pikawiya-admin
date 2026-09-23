@@ -18,6 +18,20 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co', // Matches your Supabase project URL
+      },
+      {
+        protocol: 'https',
+        hostname: '**.fbcdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.facebook.com',
+      },
+    ],
   },
   turbopack: {
     root: __dirname,

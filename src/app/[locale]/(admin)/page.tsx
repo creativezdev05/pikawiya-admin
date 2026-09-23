@@ -36,7 +36,6 @@ async function Forms() {
   if (submissionsError) {
     console.error("Failed to fetch submissions:", submissionsError);
   }
-
   // 3. Decrypt payload using node:crypto (AES-256-GCM)
   const decryptedSubmissions = (rawSubmissions || []).map((sub: any) => {
     let decryptedData: Record<string, unknown> | null = null;

@@ -1,9 +1,12 @@
+// app/profile/page.tsx
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import DangerZone from "@/components/user-profile/DangerZone";
 import Security from "@/components/user-profile/Security";
 import UserAddressCard from "@/components/user-profile/UserAddressCard";
 import UserMetaCard from "@/components/user-profile/UserMetaCard";
 import { Metadata } from "next";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Profile | TailAdmin - Next.js Admin Dashboard Template",
@@ -11,7 +14,52 @@ export const metadata: Metadata = {
     "Manage your personal information, security settings, and preference on the TailAdmin Profile page.",
 };
 
-export default function Profile() {
+export default async function Profile() {
+  const supabase = await createClient();
+
+  // 1. Fetch authenticated user from Supabase Auth
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Redirect to signin if unauthenticated
+  if (!user) {
+    redirect("/signin");
+  }
+
+  // 2. Extract Auth Metadata / Custom Claims
+  const userMetadata = user.user_metadata || {}; // full_name, avatar_url, etc.
+  const appMetadata = user.app_metadata || {};   // provider, roles, custom JWT claims
+
+  // 3. Fetch corresponding record from the 'profiles' table
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error loading user profile:", error.message);
+  }
+
+  // Consolidated user claims object
+  const claims = {
+    fullName: userMetadata.full_name || userMetadata.name || "",
+    avatarUrl: userMetadata.avatar_url || "",
+    email: user.email || "",
+    role: appMetadata.role || "user",
+    rawUserMetadata: userMetadata,
+    rawAppMetadata: appMetadata,
+  };
+
+  // 4. Server Action for Sign Out
+  async function handleSignOut() {
+    'use server';
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+    redirect("/signin");
+  }
+
   return (
     <div>
       <PageBreadcrumb pageTitle="Profile" />
@@ -20,10 +68,10 @@ export default function Profile() {
           Profile
         </h3>
         <div className="space-y-6">
-          <UserMetaCard />
-          <UserAddressCard />
-          <Security />
-          <DangerZone />
+          <UserMetaCard user={user} profile={profile} claims={claims} />
+          {/* <UserAddressCard user={user} profile={profile} claims={claims} /> */}
+          <Security user={user} profile={profile} claims={claims} />
+          <DangerZone user={user} profile={profile} claims={claims} onSignOut={handleSignOut} />
         </div>
       </div>
     </div>

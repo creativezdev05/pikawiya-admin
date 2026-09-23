@@ -1,4 +1,38 @@
-export default function DangerZone() {
+'use client';
+import { useTransition } from "react";
+import { User } from "@supabase/supabase-js";
+
+// Replace with your generated Supabase database types or a custom interface
+export interface UserClaims {
+  fullName: string;
+  avatarUrl: string;
+  email: string;
+  role: string;
+  rawUserMetadata: Record<string, any>;
+  rawAppMetadata: Record<string, any>;
+}
+interface ProfileData {
+  id: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  phone_number?: string;
+  [key: string]: any;
+}
+
+interface UserMetaCardProps {
+  user: User;
+  profile: ProfileData | null;
+  claims: UserClaims;
+  onSignOut: () => Promise<void>;
+}
+export default function DangerZone({ user, profile, claims, onSignOut }: UserMetaCardProps) {
+  const [isPending, startTransition] = useTransition();
+  const handleLogout = () => {
+    startTransition(async () => {
+      await onSignOut();
+    });
+  };
   return (
     <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-white/3">
       <h4 className="mb-4 text-lg font-semibold text-gray-800 lg:mb-6 dark:text-white/90">
@@ -15,7 +49,10 @@ export default function DangerZone() {
             </p>
           </div>
           <div>
-            <button className="flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 pe-4 ps-3.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200">
+            <button
+            onClick={handleLogout}
+            disabled={isPending}
+            className="flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 pe-4 ps-3.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200">
               <svg
                 className="rtl:-scale-x-100"
                 xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +69,7 @@ export default function DangerZone() {
                   strokeLinejoin="round"
                 />
               </svg>
-              Logout
+              {isPending ? "Logging out..." : "Log Out"}
             </button>
           </div>
         </div>

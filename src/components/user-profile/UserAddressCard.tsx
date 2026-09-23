@@ -6,8 +6,31 @@ import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Button from "../ui/button/Button";
 import { Modal } from "../ui/modal";
+import { User } from "@supabase/supabase-js";
+export interface UserClaims {
+  fullName: string;
+  avatarUrl: string;
+  email: string;
+  role: string;
+  rawUserMetadata: Record<string, any>;
+  rawAppMetadata: Record<string, any>;
+}
+interface ProfileData {
+  id: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  phone_number?: string;
+  [key: string]: any;
+}
 
-export default function UserAddressCard() {
+interface UserMetaCardProps {
+  user: User;
+  profile: ProfileData | null;
+  claims: UserClaims;
+}
+
+export default function UserAddressCard({ user, profile, claims }: UserMetaCardProps) {
   const { isOpen, openModal, closeModal } = useModal();
 
   const handleSave = () => {

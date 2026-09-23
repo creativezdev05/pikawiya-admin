@@ -2,8 +2,31 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
+export interface UserClaims {
+  fullName: string;
+  avatarUrl: string;
+  email: string;
+  role: string;
+  rawUserMetadata: Record<string, any>;
+  rawAppMetadata: Record<string, any>;
+}
+interface ProfileData {
+  id: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  phone_number?: string;
+  [key: string]: any;
+}
 
-export default function Security() {
+interface UserMetaCardProps {
+  user: User;
+  profile: ProfileData | null;
+  claims: UserClaims;
+}
+
+export default function Security({ user, profile, claims }: UserMetaCardProps) {
   const [switcherToggle, setSwitcherToggle] = useState(false);
   const router = useRouter();
 
