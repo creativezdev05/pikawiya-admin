@@ -53,7 +53,7 @@ export default function UserMetaCard({ user, profile, claims }: UserMetaCardProp
   const options = [
       { value: "manager", label: "Manager" },
       { value: "director", label: "Director" },
-      { value: "super_admin", label: "Super Admin" },
+      { value: "super_admin", label: "Super Admin"},
     ];
 
 
@@ -73,6 +73,17 @@ const handleSelectChange = (value: string) => {
   useEffect(() => {
     setPreviewAvatar(currentAvatar);
   }, [currentAvatar]);
+
+  // Inside your component:
+  useEffect(() => {
+    if (!infoMsg) return;
+    const timer = setTimeout(() => {
+      if(infoMsg === "Profile updated successfully!")
+        closeModal()
+    }, 5000);
+
+    return () => clearTimeout(timer); // Clean up timer on unmount or when infoMsg changes
+  }, [infoMsg]);
 
   const firstName = user?.user_metadata?.first_name || claims.fullName.split(" ")[0] || "";
   const lastName = user?.user_metadata?.last_name || claims.fullName.split(" ").slice(1).join(" ") || "";
@@ -132,18 +143,46 @@ const handleSelectChange = (value: string) => {
     }
 
     // STEP 2: Submit form data along with the OTP code
-    const res = await verifyAndSaveProfile(formData, otpCode);
-    setLoading(false);
+// STEP 2: Handle Avatar Upload if a file was selected
+  let uploadedAvatarUrl = currentAvatar;
 
-    if (!res.success) {
-      setErrorMsg(res.error || "Failed to update profile.");
+  if (selectedFile) {
+    const supabase = createClient();
+    const fileExt = selectedFile.name.split(".").pop();
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    const filePath = `avatars/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars") // Make sure "avatars" bucket exists in Supabase Storage
+      .upload(filePath, selectedFile, { upsert: true });
+
+    if (uploadError) {
+      setLoading(false);
+      setErrorMsg(`Avatar upload failed: ${uploadError.message}`);
       return;
     }
 
-    setShowOtpInput(false);
-    setOtpCode("");
-    setInfoMsg("Profile updated successfully!");
-  };
+    const { data: publicUrlData } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+
+    uploadedAvatarUrl = publicUrlData.publicUrl;
+  }
+
+  // STEP 3: Submit form data AND uploadedAvatarUrl
+  const res = await verifyAndSaveProfile(formData, otpCode, uploadedAvatarUrl);
+  setLoading(false);
+
+  if (!res.success) {
+    setErrorMsg(res.error || "Failed to update profile.");
+    return;
+  }
+
+  setShowOtpInput(false);
+  setOtpCode("");
+  setSelectedFile(null);
+  setInfoMsg("Profile updated successfully!");
+};
 
   return (
     <>
@@ -342,10 +381,11 @@ const handleSelectChange = (value: string) => {
                     <div>
                       <Label>Select Input</Label>
                       <input type="hidden" name="bio" value={selectedRole} />
-                      <Select
+                      <Select id="role" name="role"
                         options={options}
                         placeholder="Select Option"
                         onChange={handleSelectChange}
+                        defaultValue={selectedRole}
                         className="dark:bg-dark-900"
                       />
                     </div>

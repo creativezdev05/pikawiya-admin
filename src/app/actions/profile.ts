@@ -52,7 +52,7 @@ export async function verifyAndSaveProfile(formData: FormData, otpCode: string, 
   if (!otpCode) {
     return { success: false, error: "Verification code is required." };
   }
-
+  console.log("avatarUrl", avatarUrl, user)
   // 2. Extract Form Data FIRST (Before verifyOtp alters active session context)
   const firstName = (formData.get("firstName") as string) || "";
   const lastName = (formData.get("lastName") as string) || "";
