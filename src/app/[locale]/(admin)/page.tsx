@@ -38,7 +38,7 @@ async function Forms() {
   }
 
   // 3. Decrypt payload using node:crypto (AES-256-GCM)
-  const decryptedSubmissions = (rawSubmissions || []).map((sub) => {
+  const decryptedSubmissions = (rawSubmissions || []).map((sub: any) => {
     let decryptedData: Record<string, unknown> | null = null;
     let decryptionFailed = false;
 

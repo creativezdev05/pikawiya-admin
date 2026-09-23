@@ -108,7 +108,6 @@ export default function ForgotPasswordForm() {
 
               <div>
                 <Button
-                  type="submit"
                   className="flex w-full items-center justify-center rounded-lg bg-brand-500 px-4 py-3 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600 disabled:opacity-50"
                   disabled={loading}
                 >

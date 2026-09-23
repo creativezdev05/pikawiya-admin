@@ -104,13 +104,6 @@ export default function SignUpForm() {
   return (
     <div className="no-scrollbar flex w-full flex-1 flex-col overflow-y-auto lg:w-1/2">
       <div className="mx-auto mb-5 w-full max-w-md sm:pt-10">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-        >
-          <ChevronLeftIcon className="rtl:rotate-180" />
-          {t("backToDashboard", { fallback: "Back to dashboard" })}
-        </Link>
       </div>
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
         <div>
@@ -309,7 +302,6 @@ export default function SignUpForm() {
                 {/* Submit Button */}
                 <div>
                   <Button
-                    type="submit"
                     className="flex w-full items-center justify-center rounded-lg bg-brand-500 px-4 py-3 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600 disabled:opacity-50"
                     disabled={loading}
                   >

@@ -34,7 +34,9 @@ export default async function AnalyticsAdminPage() {
               {stat.name}
             </p>
             <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
-              {stat.name === "Avg. Session Duration" ? Number(stat.value).toLocaleString() / 60 + " min" : Number(stat.value).toLocaleString()}
+              {stat.name === "Avg. Session Duration"
+                ? (Number(stat.value) / 60).toLocaleString() + " min"
+                : Number(stat.value).toLocaleString()}
             </p>
           </div>
         ))}
