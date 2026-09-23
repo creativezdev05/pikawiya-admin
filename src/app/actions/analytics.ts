@@ -7,23 +7,26 @@ import path from "path";
 import fs from "fs";
 
 function getClientOptions() {
-  const jsonPath = path.join(process.cwd(), "pikawiya-d.json");
+  const jsonPath = path.join(process.cwd(), "pikawiya-service.json");
 
-  // 1. Local environment: Use local JSON keyfile if present
+  // 1. Local environment: Use local JSON keyfile if present on disk
   if (fs.existsSync(jsonPath)) {
     return { keyFilename: jsonPath };
   }
 
   // 2. Production/Serverless: Fallback to Base64 environment variable
-  if (process.env.GA_PRIVATE_KEY_BASE64) {
+  const base64Key = process.env.GA_PRIVATE_KEY_BASE64?.trim();
+  if (base64Key) {
+    const decodedKey = Buffer.from(base64Key, "base64").toString("utf-8");
     return {
       credentials: {
         client_email: process.env.GA_CLIENT_EMAIL?.trim(),
-        private_key: Buffer.from(process.env.GA_PRIVATE_KEY_BASE64, "base64").toString("utf-8"),
+        private_key: decodedKey,
       },
     };
   }
 
+  console.error("GA4 Client Error: No valid local keyfile or GA_PRIVATE_KEY_BASE64 found.");
   return {};
 }
 
@@ -53,7 +56,7 @@ async function fetchAnalyticsSummary() {
         { name: "averageSessionDuration" },
       ],
     });
-    console.log("response", response)
+
     const metricValues = response.rows?.[0]?.metricValues || [];
 
     return {
@@ -63,7 +66,7 @@ async function fetchAnalyticsSummary() {
       avgSessionDuration: Math.round(Number(metricValues[3]?.value || 0)),
     };
   } catch (error) {
-    console.error("Error fetching GA4 data:", error);
+    console.error("Error fetching GA4 data in production:", error);
     return null;
   }
 }
@@ -72,7 +75,7 @@ export const getAnalyticsSummary = unstable_cache(
   async () => fetchAnalyticsSummary(),
   ["ga4-analytics-summary"],
   {
-    revalidate: 1, // 6 hours
+    revalidate: 21600, // 6 hours
     tags: ["analytics"],
   }
 );
