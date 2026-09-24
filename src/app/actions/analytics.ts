@@ -32,6 +32,44 @@ function getClientOptions() {
 
 const analyticsDataClient = new BetaAnalyticsDataClient(getClientOptions());
 
+// async function fetchAnalyticsSummary() {
+//   const propertyId = process.env.GA_PROPERTY_ID?.trim();
+
+//   if (!propertyId) {
+//     console.error("GA4 Error: GA_PROPERTY_ID is missing.");
+//     return null;
+//   }
+
+//   try {
+//     const [response] = await analyticsDataClient.runReport({
+//       property: `properties/${propertyId}`,
+//       dateRanges: [
+//         {
+//           startDate: "30daysAgo",
+//           endDate: "today",
+//         },
+//       ],
+//       metrics: [
+//         { name: "activeUsers" },
+//         { name: "screenPageViews" },
+//         { name: "sessions" },
+//         { name: "averageSessionDuration" },
+//       ],
+//     });
+
+//     const metricValues = response.rows?.[0]?.metricValues || [];
+
+//     return {
+//       activeUsers: metricValues[0]?.value || "0",
+//       pageViews: metricValues[1]?.value || "0",
+//       sessions: metricValues[2]?.value || "0",
+//       avgSessionDuration: Math.round(Number(metricValues[3]?.value || 0)),
+//     };
+//   } catch (error) {
+//     console.error("Error fetching GA4 data in production:", error);
+//     return null;
+//   }
+// }
 async function fetchAnalyticsSummary() {
   const propertyId = process.env.GA_PROPERTY_ID?.trim();
 
@@ -41,32 +79,110 @@ async function fetchAnalyticsSummary() {
   }
 
   try {
-    const [response] = await analyticsDataClient.runReport({
+    // Run batch requests to fetch summary, daily trend, top pages, traffic sources & device breakdown
+    const [response] = await analyticsDataClient.batchRunReports({
       property: `properties/${propertyId}`,
-      dateRanges: [
+      requests: [
+        // 1. Overall Summary Stats
         {
-          startDate: "30daysAgo",
-          endDate: "today",
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          metrics: [
+            { name: "activeUsers" },
+            { name: "screenPageViews" },
+            { name: "sessions" },
+            { name: "averageSessionDuration" },
+          ],
         },
-      ],
-      metrics: [
-        { name: "activeUsers" },
-        { name: "screenPageViews" },
-        { name: "sessions" },
-        { name: "averageSessionDuration" },
+        // 2. Daily Trend (For Recharts Line/Area Chart)
+        {
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          dimensions: [{ name: "date" }],
+          metrics: [
+            { name: "activeUsers" },
+            { name: "screenPageViews" },
+          ],
+          orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
+        },
+        // 3. Top Pages
+        {
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          dimensions: [{ name: "pagePath" }],
+          metrics: [{ name: "screenPageViews" }],
+          limit: 5,
+          orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+        },
+        // 4. Traffic Sources
+        {
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          dimensions: [{ name: "sessionSource" }],
+          metrics: [{ name: "sessions" }],
+          limit: 5,
+          orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+        },
+        // 5. Device Categories
+        {
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          dimensions: [{ name: "deviceCategory" }],
+          metrics: [{ name: "activeUsers" }],
+        },
       ],
     });
 
-    const metricValues = response.rows?.[0]?.metricValues || [];
+    const reports = response.reports || [];
+
+    // Parse Summary
+    const summaryRow = reports[0]?.rows?.[0]?.metricValues || [];
+    const summary = {
+      activeUsers: Number(summaryRow[0]?.value || 0),
+      pageViews: Number(summaryRow[1]?.value || 0),
+      sessions: Number(summaryRow[2]?.value || 0),
+      avgSessionDuration: Math.round(Number(summaryRow[3]?.value || 0)),
+    };
+
+    // Parse Daily Trend Data
+    const dailyTrend = (reports[1]?.rows || []).map((row) => {
+      const rawDate = row.dimensionValues?.[0]?.value || "";
+      // Convert YYYYMMDD to formatted string "MMM DD" (e.g. Sep 23)
+      const formattedDate = rawDate
+        ? new Date(
+            `${rawDate.slice(0, 4)}-${rawDate.slice(4, 6)}-${rawDate.slice(6, 8)}`
+          ).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : rawDate;
+
+      return {
+        date: formattedDate,
+        Users: Number(row.metricValues?.[0]?.value || 0),
+        Views: Number(row.metricValues?.[1]?.value || 0),
+      };
+    });
+
+    // Parse Top Pages
+    const topPages = (reports[2]?.rows || []).map((row) => ({
+      path: row.dimensionValues?.[0]?.value || "/",
+      views: Number(row.metricValues?.[0]?.value || 0),
+    }));
+
+    // Parse Traffic Sources
+    const trafficSources = (reports[3]?.rows || []).map((row) => ({
+      source: row.dimensionValues?.[0]?.value || "(direct)",
+      sessions: Number(row.metricValues?.[0]?.value || 0),
+    }));
+
+    // Parse Device Categories
+    const devices = (reports[4]?.rows || []).map((row) => ({
+      name: row.dimensionValues?.[0]?.value || "desktop",
+      value: Number(row.metricValues?.[0]?.value || 0),
+    }));
 
     return {
-      activeUsers: metricValues[0]?.value || "0",
-      pageViews: metricValues[1]?.value || "0",
-      sessions: metricValues[2]?.value || "0",
-      avgSessionDuration: Math.round(Number(metricValues[3]?.value || 0)),
+      summary,
+      dailyTrend,
+      topPages,
+      trafficSources,
+      devices,
     };
   } catch (error) {
-    console.error("Error fetching GA4 data in production:", error);
+    console.error("Error fetching GA4 batch report:", error);
     return null;
   }
 }
@@ -79,3 +195,4 @@ export const getAnalyticsSummary = unstable_cache(
     tags: ["analytics"],
   }
 );
+

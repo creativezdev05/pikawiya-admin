@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   "/auth/callback",
   "/forgot-password",
   "/reset-password",
+  
 ];
 
 // Routes that ONLY guest/unauthenticated users should see (redirect logged-in users away)

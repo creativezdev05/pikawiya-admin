@@ -26,6 +26,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.2.8",
     "react-dropzone": "^20.1.1",
+    "recharts": "^3.10.1",
     "simplebar-react": "^3.3.2",
     "swiper": "^14.2.0",
     "tailwind-merge": "^2.6.0"

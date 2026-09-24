@@ -8,7 +8,20 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
-export default function LineChartOne() {
+interface SeriesData {
+  name: string;
+  data: number[];
+}
+
+interface LineChartOneProps {
+  categories?: string[];
+  series?: SeriesData[];
+}
+
+export default function LineChartOne({
+  categories = [],
+  series = [],
+}: LineChartOneProps) {
   const options: ApexOptions = {
     legend: {
       show: false, // Hide legend
@@ -68,20 +81,7 @@ export default function LineChartOne() {
     },
     xaxis: {
       type: "category", // Category-based x-axis
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      categories: categories,
       axisBorder: {
         show: false, // Hide x-axis border
       },
@@ -108,16 +108,16 @@ export default function LineChartOne() {
     },
   };
 
-  const series = [
-    {
-      name: "Sales",
-      data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
-    },
-    {
-      name: "Revenue",
-      data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
-    },
-  ];
+  // const series = [
+  //   {
+  //     name: "Sales",
+  //     data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
+  //   },
+  //   {
+  //     name: "Revenue",
+  //     data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+  //   },
+  // ];
   return (
     <div className="custom-scrollbar max-w-full overflow-x-auto">
       <div id="chartEight" className="min-w-[1000px] xl:min-w-full">

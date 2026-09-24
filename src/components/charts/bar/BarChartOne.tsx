@@ -7,8 +7,19 @@ import dynamic from "next/dynamic";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
+interface SeriesData {
+  name: string;
+  data: number[];
+}
 
-export default function BarChartOne() {
+interface BarChartOneProps {
+  categories?: string[];
+  series?: SeriesData[];
+}
+export default function BarChartOne({
+  categories = [],
+  series = [],
+}: BarChartOneProps) {
   const options: ApexOptions = {
     colors: ["#465fff"],
     chart: {
@@ -36,20 +47,7 @@ export default function BarChartOne() {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      categories:categories,
       tickPlacement: "on",
       axisBorder: {
         show: false,
@@ -89,12 +87,12 @@ export default function BarChartOne() {
       },
     },
   };
-  const series = [
-    {
-      name: "Sales",
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
-    },
-  ];
+  // const series = [
+  //   {
+  //     name: "Sales",
+  //     data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+  //   },
+  // ];
 
   return (
     <div className="custom-scrollbar max-w-full overflow-x-auto">
