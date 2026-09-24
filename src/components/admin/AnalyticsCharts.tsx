@@ -21,13 +21,13 @@ const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899"];
 
 interface AnalyticsChartsProps {
   dailyTrend: { date: string; Users: number; Views: number }[];
-  devices: { name: string; value: number }[];
+  // devices: { name: string; value: number }[];
   trafficSources: { source: string; sessions: number }[];
 }
 
 export default function AnalyticsCharts({
   dailyTrend,
-  devices,
+  // devices,
   trafficSources,
 }: AnalyticsChartsProps) {
 	// 1. Transform dailyTrend -> ApexCharts format (Line / Area Chart)
@@ -106,7 +106,7 @@ export default function AnalyticsCharts({
       </div>
 
       {/* 2. Device Breakdown Pie Chart */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/5 dark:bg-white/5">
+      {/* <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/5 dark:bg-white/5">
         <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
           Devices
         </h3>
@@ -148,7 +148,7 @@ export default function AnalyticsCharts({
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* 3. Top Traffic Sources Bar Chart */}
       <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/5 dark:bg-white/5 lg:col-span-3">

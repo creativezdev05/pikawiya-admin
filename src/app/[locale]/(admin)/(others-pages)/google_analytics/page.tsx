@@ -1,6 +1,7 @@
 // app/admin/analytics/page.tsx
 import { getAnalyticsSummary } from "@/app/actions/analytics";
 import AnalyticsCharts from "@/components/admin/AnalyticsCharts";
+import FormSubmissionsCard from "@/components/admin/FormSubmissionsCard";
 
 export default async function AnalyticsAdminPage() {
   const data = await getAnalyticsSummary();
@@ -13,7 +14,7 @@ export default async function AnalyticsAdminPage() {
     );
   }
 
-  const { summary, dailyTrend, topPages, trafficSources, devices } = data;
+  const { summary, dailyTrend, topPages, trafficSources, formSubmissions } = data;
 
   const stats = [
     { name: "Active Users (30d)", value: summary.activeUsers.toLocaleString() },
@@ -38,6 +39,7 @@ export default async function AnalyticsAdminPage() {
 
       {/* Summary Stat Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <FormSubmissionsCard formSubmissions={formSubmissions} />
         {stats.map((stat) => (
           <div
             key={stat.name}
@@ -56,7 +58,7 @@ export default async function AnalyticsAdminPage() {
       {/* Recharts Visualizations */}
       <AnalyticsCharts
         dailyTrend={dailyTrend}
-        devices={devices}
+        // devices={devices}
         trafficSources={trafficSources}
       />
 
