@@ -27,9 +27,8 @@ interface UserMetaCardProps {
   profile: ProfileData | null;
   claims: UserClaims;
   onSignOut: () => Promise<void>;
-  onDeleteAccount: () => Promise<void>;
 }
-export default function DangerZone({ user, profile, claims, onSignOut, onDeleteAccount }: UserMetaCardProps) {
+export default function DangerZone({ user, profile, claims, onSignOut }: UserMetaCardProps) {
   const [isPending, startTransition] = useTransition();
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
