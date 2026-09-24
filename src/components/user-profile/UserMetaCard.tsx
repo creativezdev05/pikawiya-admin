@@ -253,7 +253,7 @@ const handleSelectChange = (value: string) => {
               </div>
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  Bio
+                  Role
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                   {bio || "N/A"}
@@ -379,7 +379,7 @@ const handleSelectChange = (value: string) => {
 
                   <div className="col-span-2 lg:col-span-1">
                     <div>
-                      <Label>Select Input</Label>
+                      <Label>Select User Role</Label>
                       <input type="hidden" name="bio" value={selectedRole} />
                       <Select
                         options={options}

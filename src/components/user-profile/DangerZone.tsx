@@ -1,6 +1,8 @@
 'use client';
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
+import { useRouter } from 'next/navigation';
 import { User } from "@supabase/supabase-js";
+import { deleteAccount } from "@/app/actions/profile"; // Your server action created earlier
 
 // Replace with your generated Supabase database types or a custom interface
 export interface UserClaims {
@@ -25,19 +27,41 @@ interface UserMetaCardProps {
   profile: ProfileData | null;
   claims: UserClaims;
   onSignOut: () => Promise<void>;
+  onDeleteAccount: () => Promise<void>;
 }
-export default function DangerZone({ user, profile, claims, onSignOut }: UserMetaCardProps) {
+export default function DangerZone({ user, profile, claims, onSignOut, onDeleteAccount }: UserMetaCardProps) {
   const [isPending, startTransition] = useTransition();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const router = useRouter();
   const handleLogout = () => {
     startTransition(async () => {
       await onSignOut();
     });
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    setError(null);
+
+    const res = await deleteAccount();
+
+    if (!res.success) {
+      setError(res.error || "Failed to delete account.");
+      setIsDeleting(false);
+      return;
+    }
+
+    router.push("/signin");
+    router.refresh();
   };
   return (
     <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-white/3">
       <h4 className="mb-4 text-lg font-semibold text-gray-800 lg:mb-6 dark:text-white/90">
         Danger Zone
       </h4>
+      {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
       <div>
         <div className="flex flex-col justify-between gap-4 border-b border-gray-200 py-4 first:pt-0 last:border-b-0 last:pb-0 sm:flex-row sm:items-end dark:border-gray-800">
           <div>
@@ -84,7 +108,9 @@ export default function DangerZone({ user, profile, claims, onSignOut }: UserMet
             </p>
           </div>
           <div>
-            <button className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-error-500 py-2.5 pe-4 ps-3.5 text-sm font-medium text-error-500 transition-all hover:bg-error-100 dark:border-error-500/15 dark:hover:bg-red-500/15">
+            {/* Delete Account Trigger */}
+        {!showConfirm ? (
+         <button disabled={isDeleting} onClick={() => setShowConfirm(true)} className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-error-500 py-2.5 pe-4 ps-3.5 text-sm font-medium text-error-500 transition-all hover:bg-error-100 dark:border-error-500/15 dark:hover:bg-red-500/15">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -102,6 +128,25 @@ export default function DangerZone({ user, profile, claims, onSignOut }: UserMet
               </svg>
               Delete account
             </button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              disabled={isDeleting}
+              onClick={handleDeleteAccount}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50"
+            >
+              {isDeleting ? "Deleting..." : "Confirm Delete"}
+            </button>
+            <button
+              disabled={isDeleting}
+              onClick={() => setShowConfirm(false)}
+              className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+            
           </div>
         </div>
       </div>
