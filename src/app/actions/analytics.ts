@@ -6,6 +6,7 @@ import { unstable_cache } from "next/cache";
 import path from "path";
 import fs from "fs";
 
+
 function getClientOptions() {
   const jsonPath = path.join(process.cwd(), "pikawiya-service.json");
 
@@ -94,6 +95,7 @@ async function fetchAnalyticsSummary() {
                   "submit_membership_form",
                   "submit_complaint_form",
                   "submit_contact_form",
+                  "submit_feedback_form", // Add feedback form here!
                   "form_submit", // Fallback for automatic GA4 tracking
                 ],
               },
@@ -174,6 +176,8 @@ function formatFormLabel(eventName: string): string {
       return "Complaint Forms";
     case "submit_contact_form":
       return "Contact Forms";
+    case "submit_feedback_form":
+      return "Feedback Forms";
     default:
       return "General Form Submissions";
   }
