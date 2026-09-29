@@ -74,9 +74,9 @@
   --color-gray-600: #475467;
   --color-gray-700: #344054;
   --color-gray-800: #1d2939;
-  --color-gray-900: #101828;
+  --color-gray-900: #1b2433;
   --color-gray-950: #0c111d;
-  --color-gray-dark: #1a2231;
+  --color-gray-dark: #1b2433;
 
   --color-orange-25: #fffaf5;
   --color-orange-50: #fff6ed;
@@ -1129,6 +1129,22 @@ pre[class*="language-"].line-numbers {
   .custom-calendar [role="grid"].fc-multimonth [role="columnheader"] {
     border-radius: 0 !important;
   }
+}
+
+/* Page background pattern drift, used by the light-theme admin shell background */
+@keyframes drift {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(-15px, 10px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+.animate-drift {
+  animation: drift 5s ease-in-out infinite;
 }
 
 @media (max-width: 640px) {

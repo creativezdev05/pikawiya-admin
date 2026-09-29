@@ -336,7 +336,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-50 flex h-full flex-col border-r border-gray-200 bg-white px-5 text-gray-900 transition-all duration-300 ease-in-out xl:mt-0 rtl:right-0 rtl:left-auto rtl:border-r-0 rtl:border-l dark:border-gray-800 dark:bg-gray-900 ${
+      className={`fixed top-0 left-0 z-50 flex h-full flex-col border-r border-gray-200 bg-gray-900 px-5 text-gray-900 backdrop-blur-xl transition-all duration-300 ease-in-out xl:mt-0 rtl:right-0 rtl:left-auto rtl:border-r-0 rtl:border-l dark:border-gray-800 dark:bg-gray-900 ${
         isExpanded || isMobileOpen ? "w-72.5" : isHovered ? "w-72.5" : "w-22.5"
       } ${
         isMobileOpen
@@ -346,6 +346,7 @@ const AppSidebar: React.FC = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      
       <div
         className={`flex py-8 ${
           !isExpanded && !isHovered ? "xl:justify-center" : "justify-start"
@@ -356,7 +357,7 @@ const AppSidebar: React.FC = () => {
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/logo-pikawiya.png"
+                src="/images/logo/pika_wiya_logo.png"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -365,7 +366,7 @@ const AppSidebar: React.FC = () => {
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/logo-pikawiya.png"
+                src="/images/logo/pika_wiya_logo.png"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -375,7 +376,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <Image
-              src="/images/logo/logo-pikawiya.png"
+              src="/images/logo/pika_wiya_logo.png"
               alt="Logo"
               width={32}
               height={32}

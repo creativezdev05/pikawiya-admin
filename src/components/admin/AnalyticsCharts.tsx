@@ -23,12 +23,16 @@ interface AnalyticsChartsProps {
   dailyTrend: { date: string; Users: number; Views: number }[];
   // devices: { name: string; value: number }[];
   trafficSources: { source: string; sessions: number }[];
+  deviceBreakdown: { device: string; users: number }[];
+  countryBreakdown: { country: string; users: number }[];
 }
 
 export default function AnalyticsCharts({
   dailyTrend,
   // devices,
   trafficSources,
+  deviceBreakdown,
+  countryBreakdown,
 }: AnalyticsChartsProps) {
 	// 1. Transform dailyTrend -> ApexCharts format (Line / Area Chart)
 	console.log("trafficSources", trafficSources)
@@ -50,6 +54,24 @@ export default function AnalyticsCharts({
     {
       name: "Sessions",
       data: trafficSources.map((item) => item.sessions),
+    },
+  ];
+
+  // 3. Transform deviceBreakdown -> ApexCharts format (Bar Chart)
+  const deviceCategories = deviceBreakdown.map((item) => item.device);
+  const deviceSeries = [
+    {
+      name: "Users",
+      data: deviceBreakdown.map((item) => item.users),
+    },
+  ];
+
+  // 4. Transform countryBreakdown -> ApexCharts format (Bar Chart)
+  const countryCategories = countryBreakdown.map((item) => item.country);
+  const countrySeries = [
+    {
+      name: "Users",
+      data: countryBreakdown.map((item) => item.users),
     },
   ];
   return (
@@ -179,6 +201,26 @@ export default function AnalyticsCharts({
             </BarChart>
           </ResponsiveContainer> */}
 					<BarChartOne categories={barCategories} series={barSeries} />
+        </div>
+      </div>
+
+      {/* 4. Device Breakdown Bar Chart */}
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/5 dark:bg-white/5">
+        <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
+          Users by Device
+        </h3>
+        <div className="h-60 w-full">
+          <BarChartOne categories={deviceCategories} series={deviceSeries} />
+        </div>
+      </div>
+
+      {/* 5. Country Breakdown Bar Chart */}
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/5 dark:bg-white/5 lg:col-span-2">
+        <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">
+          Top Countries
+        </h3>
+        <div className="h-60 w-full">
+          <BarChartOne categories={countryCategories} series={countrySeries} />
         </div>
       </div>
     </div>

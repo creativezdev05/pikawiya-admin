@@ -33,6 +33,17 @@ function getClientOptions() {
 
 const analyticsDataClient = new BetaAnalyticsDataClient(getClientOptions());
 
+// Known form event names tracked on the public site. Kept alongside a
+// "contains form" match below so events fired under a new/different name
+// still surface instead of silently disappearing from the report.
+const KNOWN_FORM_EVENTS = [
+  "submit_membership_form",
+  "submit_complaint_form",
+  "submit_contact_form",
+  "submit_feedback_form",
+  "form_submit", // Fallback for automatic GA4 enhanced-measurement tracking
+];
+
 async function fetchAnalyticsSummary() {
   const propertyId = process.env.GA_PROPERTY_ID?.trim();
 
@@ -42,70 +53,137 @@ async function fetchAnalyticsSummary() {
   }
 
   try {
-    // GA4 batchRunReports allows a MAXIMUM of 5 requests per batch call
-    const [response] = await analyticsDataClient.batchRunReports({
-      property: `properties/${propertyId}`,
-      requests: [
-        // 1. Overall Summary Stats
-        {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          metrics: [
-            { name: "activeUsers" },
-            { name: "screenPageViews" },
-            { name: "sessions" },
-            { name: "averageSessionDuration" },
-          ],
-        },
-        // 2. Daily Trend (For Recharts Line/Area Chart)
-        {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          dimensions: [{ name: "date" }],
-          metrics: [
-            { name: "activeUsers" },
-            { name: "screenPageViews" },
-          ],
-          orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
-        },
-        // 3. Top Pages
-        {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          dimensions: [{ name: "pagePath" }],
-          metrics: [{ name: "screenPageViews" }],
-          limit: 5,
-          orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
-        },
-        // 4. Traffic Sources
-        {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          dimensions: [{ name: "sessionSource" }],
-          metrics: [{ name: "sessions" }],
-          limit: 5,
-          orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
-        },
-        // 5. Form Submissions Breakdown
-        {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          dimensions: [{ name: "eventName" }],
-          metrics: [{ name: "eventCount" }],
-          dimensionFilter: {
-            filter: {
-              fieldName: "eventName",
-              inListFilter: {
-                values: [
-                  "submit_membership_form",
-                  "submit_complaint_form",
-                  "submit_contact_form",
-                  "submit_feedback_form", // Add feedback form here!
-                  "form_submit", // Fallback for automatic GA4 tracking
+    // GA4 batchRunReports allows a MAXIMUM of 5 requests per batch call,
+    // so the report is split across two batches run in parallel.
+    const [batchOne, batchTwo] = await Promise.all([
+      analyticsDataClient.batchRunReports({
+        property: `properties/${propertyId}`,
+        requests: [
+          // 1. Overall Summary Stats
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            metrics: [
+              { name: "activeUsers" },
+              { name: "screenPageViews" },
+              { name: "sessions" },
+              { name: "averageSessionDuration" },
+              { name: "newUsers" },
+              { name: "bounceRate" },
+              { name: "engagementRate" },
+            ],
+          },
+          // 2. Daily Trend (For Recharts Line/Area Chart)
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "date" }],
+            metrics: [
+              { name: "activeUsers" },
+              { name: "screenPageViews" },
+            ],
+            orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
+          },
+          // 3. Top Pages
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "pagePath" }],
+            metrics: [{ name: "screenPageViews" }],
+            limit: 5,
+            orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+          },
+          // 4. Traffic Sources
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "sessionSource" }],
+            metrics: [{ name: "sessions" }],
+            limit: 5,
+            orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+          },
+          // 5. Form Submissions Breakdown — matches known event names OR any
+          // event whose name contains "form", so differently-named form
+          // events (e.g. a newly added form) still show up.
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "eventName" }],
+            metrics: [{ name: "eventCount" }],
+            dimensionFilter: {
+              orGroup: {
+                expressions: [
+                  {
+                    filter: {
+                      fieldName: "eventName",
+                      inListFilter: { values: KNOWN_FORM_EVENTS },
+                    },
+                  },
+                  {
+                    filter: {
+                      fieldName: "eventName",
+                      stringFilter: {
+                        matchType: "CONTAINS",
+                        value: "form",
+                        caseSensitive: false,
+                      },
+                    },
+                  },
                 ],
               },
             },
+            limit: 15,
+            orderBys: [{ metric: { metricName: "eventCount" }, desc: true }],
           },
-        },
-      ],
-    });
+        ],
+      }),
+      analyticsDataClient.batchRunReports({
+        property: `properties/${propertyId}`,
+        requests: [
+          // 6. Device Category Breakdown
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "deviceCategory" }],
+            metrics: [{ name: "activeUsers" }],
+            limit: 5,
+            orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+          },
+          // 7. Country Breakdown
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "country" }],
+            metrics: [{ name: "activeUsers" }],
+            limit: 5,
+            orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+          },
+          // 8. New vs Returning Users
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "newVsReturning" }],
+            metrics: [{ name: "activeUsers" }],
+            orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+          },
+          // 9. Landing Pages
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "landingPage" }],
+            metrics: [{ name: "sessions" }],
+            limit: 5,
+            orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+          },
+          // 10. All Events (diagnostic, unfiltered) — lets the dashboard
+          // show every event GA4 is actually receiving, so a form event
+          // fired under an unexpected name is still visible somewhere.
+          {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "eventName" }],
+            metrics: [{ name: "eventCount" }],
+            limit: 15,
+            orderBys: [{ metric: { metricName: "eventCount" }, desc: true }],
+          },
+        ],
+      }),
+    ]);
 
-    const reports = response.reports || [];
+    const reports = batchOne[0].reports || [];
+    const reports2 = batchTwo[0].reports || [];
+
+    console.log("Reports here", reports, reports2);
 
     // Parse Summary (Request 0)
     const summaryRow = reports[0]?.rows?.[0]?.metricValues || [];
@@ -114,6 +192,9 @@ async function fetchAnalyticsSummary() {
       pageViews: Number(summaryRow[1]?.value || 0),
       sessions: Number(summaryRow[2]?.value || 0),
       avgSessionDuration: Math.round(Number(summaryRow[3]?.value || 0)),
+      newUsers: Number(summaryRow[4]?.value || 0),
+      bounceRate: Math.round(Number(summaryRow[5]?.value || 0) * 1000) / 10,
+      engagementRate: Math.round(Number(summaryRow[6]?.value || 0) * 1000) / 10,
     };
 
     // Parse Daily Trend Data (Request 1)
@@ -154,12 +235,48 @@ async function fetchAnalyticsSummary() {
       };
     });
 
+    // Parse Device Category Breakdown (Batch 2, Request 0)
+    const deviceBreakdown = (reports2[0]?.rows || []).map((row) => ({
+      device: row.dimensionValues?.[0]?.value || "unknown",
+      users: Number(row.metricValues?.[0]?.value || 0),
+    }));
+
+    // Parse Country Breakdown (Batch 2, Request 1)
+    const countryBreakdown = (reports2[1]?.rows || []).map((row) => ({
+      country: row.dimensionValues?.[0]?.value || "(not set)",
+      users: Number(row.metricValues?.[0]?.value || 0),
+    }));
+
+    // Parse New vs Returning Users (Batch 2, Request 2)
+    const newVsReturning = (reports2[2]?.rows || []).map((row) => ({
+      type: row.dimensionValues?.[0]?.value || "(not set)",
+      users: Number(row.metricValues?.[0]?.value || 0),
+    }));
+
+    // Parse Landing Pages (Batch 2, Request 3)
+    const landingPages = (reports2[3]?.rows || []).map((row) => ({
+      path: row.dimensionValues?.[0]?.value || "/",
+      sessions: Number(row.metricValues?.[0]?.value || 0),
+    }));
+
+    // Parse All Events — diagnostic list of every event GA4 received, so
+    // forms firing under an unexpected event name are still visible.
+    const allEvents = (reports2[4]?.rows || []).map((row) => ({
+      eventName: row.dimensionValues?.[0]?.value || "",
+      count: Number(row.metricValues?.[0]?.value || 0),
+    }));
+
     return {
       summary,
       dailyTrend,
       topPages,
       trafficSources,
       formSubmissions,
+      deviceBreakdown,
+      countryBreakdown,
+      newVsReturning,
+      landingPages,
+      allEvents,
     };
   } catch (error) {
     console.error("Error fetching GA4 batch report:", error);
@@ -178,8 +295,14 @@ function formatFormLabel(eventName: string): string {
       return "Contact Forms";
     case "submit_feedback_form":
       return "Feedback Forms";
-    default:
+    case "form_submit":
       return "General Form Submissions";
+    default:
+      // Unrecognized "*form*" event (e.g. a newly added form) — prettify
+      // the raw event name instead of hiding it in a generic bucket.
+      return eventName
+        .replace(/[_-]+/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
   }
 }
 
