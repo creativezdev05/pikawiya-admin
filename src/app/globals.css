@@ -40,16 +40,16 @@
 
   --color-brand-25: #f2f7ff;
   --color-brand-50: #ecf3ff;
-  --color-brand-100: #dde9ff;
-  --color-brand-200: #c2d6ff;
-  --color-brand-300: #9cb9ff;
-  --color-brand-400: #7592ff;
-  --color-brand-500: #465fff;
-  --color-brand-600: #3641f5;
-  --color-brand-700: #2a31d8;
-  --color-brand-800: #252dae;
-  --color-brand-900: #262e89;
-  --color-brand-950: #161950;
+  --color-brand-100: #ddeaff;
+  --color-brand-200: #c2d9ff;
+  --color-brand-300: #9cc1ff;
+  --color-brand-400: #75a9ff;
+  --color-brand-500: #468bff;
+  --color-brand-600: #367ef5;
+  --color-brand-700: #2a6bd8;
+  --color-brand-800: #2558ae;
+  --color-brand-900: #264b89;
+  --color-brand-950: #162c50;
 
   --color-blue-light-25: #f5fbff;
   --color-blue-light-50: #f0f9ff;
@@ -70,12 +70,12 @@
   --color-gray-200: #e4e7ec;
   --color-gray-300: #d0d5dd;
   --color-gray-400: #98a2b3;
-  --color-gray-500: #667085;
-  --color-gray-600: #475467;
+  --color-gray-500: #667285;
+  --color-gray-600: #475367;
   --color-gray-700: #344054;
-  --color-gray-800: #1d2939;
+  --color-gray-800: #1d2839;
   --color-gray-900: #1b2433;
-  --color-gray-950: #0c111d;
+  --color-gray-950: #0c121d;
   --color-gray-dark: #1b2433;
 
   --color-orange-25: #fffaf5;
@@ -148,7 +148,7 @@
     0px 20px 24px -4px rgba(16, 24, 40, 0.08),
     0px 8px 8px -4px rgba(16, 24, 40, 0.03);
   --shadow-datepicker: -5px 0 0 #262d3c, 5px 0 0 #262d3c;
-  --shadow-focus-ring: 0px 0px 0px 4px rgba(70, 95, 255, 0.12);
+  --shadow-focus-ring: 0px 0px 0px 4px rgba(70, 139, 255, 0.12);
   --shadow-slider-navigation:
     0px 1px 2px 0px rgba(16, 24, 40, 0.1), 0px 1px 3px 0px rgba(16, 24, 40, 0.1);
   --shadow-tooltip:
@@ -664,14 +664,14 @@ span.flatpickr-weekday,
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: #465fff;
+  background: #468bff;
   @apply !border-brand-500 !bg-brand-500 hover:!border-brand-500 hover:!bg-brand-500;
 }
 
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
-  box-shadow: -10px 0 0 #465fff;
+  box-shadow: -10px 0 0 #468bff;
 }
 
 .flatpickr-months .flatpickr-prev-month svg,
@@ -849,17 +849,17 @@ pre[class*="language-"].line-numbers {
   @apply !fill-gray-300 hover:!fill-brand-500 dark:!fill-gray-700 dark:hover:!fill-brand-500;
 }
 #mapTwo .jvectormap-region.jvectormap-element {
-  fill: #9cb9ff !important;
+  fill: #9cc1ff !important;
   stroke: transparent !important;
 }
 #mapTwo .jvectormap-region.jvectormap-element:hover {
-  fill: #8098f9 !important;
+  fill: #80adf9 !important;
 }
 .dark #mapTwo .jvectormap-region.jvectormap-element {
-  fill: #9cb9ff !important;
+  fill: #9cc1ff !important;
 }
 #mapTwo .jvectormap-region[data-code="US"] {
-  fill: #465fff !important;
+  fill: #468bff !important;
 }
 
 .api-token-chart .apexcharts-tooltip {
@@ -870,54 +870,54 @@ pre[class*="language-"].line-numbers {
 
 /* Customer Pin-Point Map */
 #mapCustomerPinPoint .jvectormap-region.jvm-element {
-  fill: #c5d8ff !important;
+  fill: #c5dbff !important;
   stroke: white !important;
   stroke-width: 2 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-CA"] {
-  fill: #465fff !important;
+  fill: #468bff !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-NV"] {
-  fill: #465fff !important;
+  fill: #468bff !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-NY"] {
-  fill: #3538cd !important;
+  fill: #356ecd !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-FL"] {
-  fill: #3538cd !important;
+  fill: #356ecd !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-MI"] {
-  fill: #3538cd !important;
+  fill: #356ecd !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-WA"] {
-  fill: #3538cd !important;
+  fill: #356ecd !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-TX"] {
-  fill: #8098f9 !important;
+  fill: #80adf9 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-IL"] {
-  fill: #8098f9 !important;
+  fill: #80adf9 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-PA"] {
-  fill: #8098f9 !important;
+  fill: #80adf9 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-OH"] {
-  fill: #8098f9 !important;
+  fill: #80adf9 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-GA"] {
-  fill: #8098f9 !important;
+  fill: #80adf9 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-NC"] {
-  fill: #8098f9 !important;
+  fill: #80adf9 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-CO"] {
-  fill: #9cb9ff !important;
+  fill: #9cc1ff !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-AZ"] {
-  fill: #9cb9ff !important;
+  fill: #9cc1ff !important;
 }
 #mapCustomerPinPoint .jvectormap-region.jvectormap-element:hover {
-  fill: #465fff !important;
+  fill: #468bff !important;
 }
 .dark #mapCustomerPinPoint .jvectormap-region.jvectormap-element {
   stroke: #1f2937 !important;
@@ -925,7 +925,7 @@ pre[class*="language-"].line-numbers {
 
 /* Customer map markers: solid filled circles with white ring */
 #mapCustomerPinPoint .jvectormap-marker.jvectormap-element {
-  fill: #465fff !important;
+  fill: #468bff !important;
   stroke: white !important;
   stroke-width: 2 !important;
   fill-opacity: 1 !important;
@@ -945,7 +945,7 @@ pre[class*="language-"].line-numbers {
   height: 20px;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #465fff;
+  border: 2px solid #468bff;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
@@ -954,7 +954,7 @@ pre[class*="language-"].line-numbers {
   height: 20px;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #465fff;
+  border: 2px solid #468bff;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }

@@ -30,13 +30,12 @@ export default function AuthLayout({
                   />
                 </Link>
                 <p className="text-center text-gray-400 dark:text-white/60">
-                  Free and Open-Source Tailwind CSS Admin Dashboard Template
+                  Health Service
                 </p>
               </div>
             </div>
           </div>
           <div className="fixed bottom-6 right-6 z-50 hidden sm:block">
-            <ThemeTogglerTwo />
           </div>
         </div>
       </ThemeProvider>

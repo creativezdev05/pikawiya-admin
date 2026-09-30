@@ -32,7 +32,7 @@ export default function MonthlySalesChart() {
   const t = useTranslations("ecommerce");
   const tCommon = useTranslations("common");
   const options: ApexOptions = {
-    colors: ["#465fff"],
+    colors: ["#468bff"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "bar",

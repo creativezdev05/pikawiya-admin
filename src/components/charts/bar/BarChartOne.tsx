@@ -21,7 +21,7 @@ export default function BarChartOne({
   series = [],
 }: BarChartOneProps) {
   const options: ApexOptions = {
-    colors: ["#465fff"],
+    colors: ["#468bff"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "bar",
