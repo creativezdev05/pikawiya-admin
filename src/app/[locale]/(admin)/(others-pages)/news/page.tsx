@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { syncFacebookToSupabase, deleteNewsPost } from "@/app/actions/news";
 import Image from "next/image";
 import NewsAdminClient from "./NewsAdminClient";
+import EditPostButton from "@/components/facebook-posts/EditPostButton";
 
 export default async function NewsAdminPage() {
   const supabase = await createClient();
@@ -102,19 +103,32 @@ export default async function NewsAdminPage() {
                     {new Date(post.published_at).toLocaleDateString()}
                   </td>
                   <td className="p-4 text-right">
-                    <form
-                      action={async () => {
-                        "use server";
-                        await deleteNewsPost(post.id, post.facebook_post_id);
-                      }}
-                    >
-                      <button
-                        type="submit"
-                        className="text-xs font-medium text-red-600 hover:underline"
+                    <div className="flex items-center justify-end gap-3">
+                      {!post.facebook_post_id && (
+                        <EditPostButton
+                          post={{
+                            id: post.id,
+                            title: post.title,
+                            content: post.content,
+                            image_url: post.image_url,
+                            link_url: post.link_url,
+                          }}
+                        />
+                      )}
+                      <form
+                        action={async () => {
+                          "use server";
+                          await deleteNewsPost(post.id, post.facebook_post_id);
+                        }}
                       >
-                        Delete
-                      </button>
-                    </form>
+                        <button
+                          type="submit"
+                          className="text-xs font-medium text-red-600 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    </div>
                   </td>
                 </tr>
               ))

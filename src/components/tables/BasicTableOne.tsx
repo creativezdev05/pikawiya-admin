@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Badge from "../ui/badge/Badge";
 import {
   Table,
@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import Pagination from "./Pagination";
 
 // 1. Types for Form Data & Props
 export interface FormRecord {
@@ -24,8 +25,152 @@ interface DynamicTableProps {
   data: FormRecord[];
 }
 
+type SortKey = "id" | "form_type" | "status" | "min_role_required" | "created_at";
+type SortDirection = "asc" | "desc";
+
+const PAGE_SIZE = 10;
+
+// Extracts the inner payload object out of a decrypted record, mirroring the
+// shape used by the "View Details" modal, so search can match the same data.
+function extractPayload(
+  raw: FormRecord["decryptedData"],
+): Record<string, unknown> {
+  let targetObj: Record<string, unknown> = {};
+
+  if (typeof raw === "object" && raw !== null) {
+    if ("Payload" in raw && typeof (raw as any).Payload === "object") {
+      targetObj = (raw as any).Payload;
+    } else if ("payload" in raw && typeof (raw as any).payload === "object") {
+      targetObj = (raw as any).payload;
+    } else {
+      targetObj = raw as Record<string, unknown>;
+    }
+  }
+
+  if (typeof targetObj === "string") {
+    try {
+      targetObj = JSON.parse(targetObj);
+    } catch {
+      targetObj = {};
+    }
+  }
+
+  return targetObj;
+}
+
+function getSearchableText(item: FormRecord): string {
+  const payload = extractPayload(item.decryptedData);
+  const payloadValues = Object.values(payload).map((value) =>
+    typeof value === "object" && value !== null
+      ? JSON.stringify(value)
+      : String(value ?? ""),
+  );
+
+  return [
+    String(item.id),
+    item.form_type,
+    item.status,
+    item.min_role_required,
+    item.created_at,
+    ...payloadValues,
+  ]
+    .join(" ")
+    .toLowerCase();
+}
+
+function SortIcon({ direction }: { direction: SortDirection | null }) {
+  return (
+    <span className="flex flex-col">
+      <svg
+        className={`h-2 w-2.5 ${
+          direction === "asc" ? "text-gray-700 dark:text-white" : "text-gray-300 dark:text-gray-600"
+        }`}
+        viewBox="0 0 10 6"
+        fill="none"
+      >
+        <path d="M1 5L5 1L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <svg
+        className={`h-2 w-2.5 ${
+          direction === "desc" ? "text-gray-700 dark:text-white" : "text-gray-300 dark:text-gray-600"
+        }`}
+        viewBox="0 0 10 6"
+        fill="none"
+      >
+        <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
+}
+
 export default function BasicTableOne({ data }: DynamicTableProps) {
   const [selectedRecord, setSelectedRecord] = useState<FormRecord | null>(null);
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDirection>("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const formTypes = useMemo(
+    () => Array.from(new Set(data.map((item) => item.form_type))).sort(),
+    [data],
+  );
+
+  const filteredData = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return data.filter((item) => {
+      if (typeFilter && item.form_type !== typeFilter) return false;
+      if (!query) return true;
+      return getSearchableText(item).includes(query);
+    });
+  }, [data, search, typeFilter]);
+
+  const sortedData = useMemo(() => {
+    if (!sortKey) return filteredData;
+    const dir = sortDir === "asc" ? 1 : -1;
+
+    return [...filteredData].sort((a, b) => {
+      let aVal: string | number;
+      let bVal: string | number;
+
+      if (sortKey === "created_at") {
+        aVal = new Date(a.created_at).getTime();
+        bVal = new Date(b.created_at).getTime();
+      } else if (sortKey === "id") {
+        const aNum = Number(a.id);
+        const bNum = Number(b.id);
+        aVal = Number.isNaN(aNum) ? String(a.id) : aNum;
+        bVal = Number.isNaN(bNum) ? String(b.id) : bNum;
+      } else {
+        aVal = String(a[sortKey] ?? "").toLowerCase();
+        bVal = String(b[sortKey] ?? "").toLowerCase();
+      }
+
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
+  }, [filteredData, sortKey, sortDir]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, typeFilter, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedData.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedData = sortedData.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
 
   // Helper function to map badge colors based on status
   const getStatusColor = (status: string) => {
@@ -40,77 +185,152 @@ export default function BasicTableOne({ data }: DynamicTableProps) {
     }
   };
 
+  const columns: { key: SortKey; label: string }[] = [
+    { key: "id", label: "ID" },
+    { key: "form_type", label: "Form Type" },
+    { key: "status", label: "Status" },
+    { key: "min_role_required", label: "Min Role" },
+  ];
+
   return (
     <>
+      {/* Toolbar: Search + Type Filter */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-xs">
+          <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name, email, ICN, status..."
+            className="h-10 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-9 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+          />
+        </div>
+
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden sm:w-56 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+        >
+          <option value="">All Form Types</option>
+          {formTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
         <div className="max-w-full overflow-x-auto">
           <Table>
             {/* Table Header */}
             <TableHeader className="border-b border-gray-100 dark:border-white/5">
               <TableRow>
-                <TableCell isHeader className="p-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                  ID
-                </TableCell>
-                <TableCell isHeader className="p-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                  Form Type
-                </TableCell>
-                <TableCell isHeader className="p-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                  Status
-                </TableCell>
-                <TableCell isHeader className="p-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                  Min Role
-                </TableCell>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.key}
+                    isHeader
+                    className="p-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleSort(column.key)}
+                      className="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-gray-200"
+                    >
+                      {column.label}
+                      <SortIcon direction={sortKey === column.key ? sortDir : null} />
+                    </button>
+                  </TableCell>
+                ))}
                 <TableCell isHeader className="p-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
                   Decrypted Data
                 </TableCell>
                 <TableCell isHeader className="p-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                  Created At
+                  <button
+                    type="button"
+                    onClick={() => handleSort("created_at")}
+                    className="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-gray-200"
+                  >
+                    Created At
+                    <SortIcon direction={sortKey === "created_at" ? sortDir : null} />
+                  </button>
                 </TableCell>
               </TableRow>
             </TableHeader>
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-              {data.map((item) => (
-                <TableRow
-                  key={item.id}
-                  onClick={() => setSelectedRecord(item)}
-                  className="cursor-pointer transition-colors hover:bg-gray-50/80 dark:hover:bg-white/5"
-                >
-                  <TableCell className="p-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">
-                    #{item.id}
-                  </TableCell>
-                  <TableCell className="p-3 text-theme-sm text-gray-700 dark:text-gray-300">
-                    {item.form_type}
-                  </TableCell>
-                  <TableCell className="p-3 text-theme-sm">
-                    <Badge size="sm" color={getStatusColor(item.status)}>
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="p-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                    <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                      {item.min_role_required}
-                    </span>
-                  </TableCell>
-                  <TableCell className="p-3 text-theme-sm text-brand-500 hover:underline dark:text-brand-400">
-                    <span className="inline-flex items-center gap-1.5 font-medium">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      View Details
-                    </span>
-                  </TableCell>
-                  <TableCell className="p-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                    {item.created_at}
-                  </TableCell>
+              {paginatedData.length === 0 ? (
+                <TableRow>
+                  <td
+                    colSpan={columns.length + 2}
+                    className="p-6 text-center text-theme-sm text-gray-500 dark:text-gray-400"
+                  >
+                    No submissions match your search or filter.
+                  </td>
                 </TableRow>
-              ))}
+              ) : (
+                paginatedData.map((item) => (
+                  <TableRow
+                    key={item.id}
+                    onClick={() => setSelectedRecord(item)}
+                    className="cursor-pointer transition-colors hover:bg-gray-50/80 dark:hover:bg-white/5"
+                  >
+                    <TableCell className="p-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">
+                      #{item.id}
+                    </TableCell>
+                    <TableCell className="p-3 text-theme-sm text-gray-700 dark:text-gray-300">
+                      {item.form_type}
+                    </TableCell>
+                    <TableCell className="p-3 text-theme-sm">
+                      <Badge size="sm" color={getStatusColor(item.status)}>
+                        {item.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="p-3 text-theme-sm text-gray-500 dark:text-gray-400">
+                      <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        {item.min_role_required}
+                      </span>
+                    </TableCell>
+                    <TableCell className="p-3 text-theme-sm text-brand-500 hover:underline dark:text-brand-400">
+                      <span className="inline-flex items-center gap-1.5 font-medium">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        View Details
+                      </span>
+                    </TableCell>
+                    <TableCell className="p-3 text-theme-sm text-gray-500 dark:text-gray-400">
+                      {item.created_at}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {sortedData.length > 0 && (
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-theme-sm text-gray-500 dark:text-gray-400">
+            Showing {(safePage - 1) * PAGE_SIZE + 1}-
+            {Math.min(safePage * PAGE_SIZE, sortedData.length)} of {sortedData.length}
+          </p>
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(Math.min(Math.max(page, 1), totalPages))}
+          />
+        </div>
+      )}
 
       {/* Decrypted Data Modal */}
       {selectedRecord && (
@@ -140,31 +360,7 @@ export default function BasicTableOne({ data }: DynamicTableProps) {
             <div className="max-h-[60vh] overflow-x-auto overflow-y-auto p-6">
               <div className="overflow-auto rounded-lg border border-gray-200 dark:border-gray-800">
                 {(() => {
-                  // 1. Get raw data
-                  const rawData = selectedRecord.decryptedData;
-
-                  // 2. Extract inner Payload if present, otherwise use rawData
-                  let targetObj: Record<string, unknown> = {};
-                  
-                  if (typeof rawData === "object" && rawData !== null) {
-                    if ("Payload" in rawData && typeof (rawData as any).Payload === "object") {
-                      targetObj = (rawData as any).Payload;
-                    } else if ("payload" in rawData && typeof (rawData as any).payload === "object") {
-                      targetObj = (rawData as any).payload;
-                    } else {
-                      targetObj = rawData as Record<string, unknown>;
-                    }
-                  }
-
-                  // If payload was stringified JSON, parse it safely
-                  if (typeof targetObj === "string") {
-                    try {
-                      targetObj = JSON.parse(targetObj);
-                    } catch {
-                      targetObj = {};
-                    }
-                  }
-
+                  const targetObj = extractPayload(selectedRecord.decryptedData);
                   const keys = Object.keys(targetObj);
 
                   return (

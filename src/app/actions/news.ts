@@ -68,11 +68,11 @@ export async function createAndPublishPost(formData: FormData) {
   const imageUrl = formData.get("imageUrl") as string;
   const target = (formData.get("target") as "BOTH" | "WEBSITE_ONLY" | "FACEBOOK_ONLY") || "BOTH";
 
-  if (!content) {
-    return { success: false, error: "Post content is required" };
+  if (!imageUrl && !title) {
+    return { success: false, error: "Title is required when no image is uploaded" };
   }
 
-  const fullMessage = title ? `${title}\n\n${content}` : content;
+  const fullMessage = [title, content].filter(Boolean).join("\n\n");
   let facebookPostId: string | null = null;
   const finalImageUrl = imageUrl || null;
 
@@ -144,7 +144,36 @@ export async function createAndPublishPost(formData: FormData) {
   return { success: true };
 }
 
-// 4. Delete Post
+// 4. Update Post (website-only posts — not synced with a Facebook post)
+export async function updateNewsPost(id: string, formData: FormData) {
+  const supabase = await createClient();
+
+  const title = formData.get("title") as string;
+  const content = formData.get("content") as string;
+  const linkUrl = formData.get("linkUrl") as string;
+  const imageUrl = formData.get("imageUrl") as string;
+
+  if (!imageUrl && !title) {
+    return { success: false, error: "Title is required when no image is uploaded" };
+  }
+
+  const { error } = await supabase
+    .from("news_posts")
+    .update({
+      title: title || "Community Update",
+      content: content || "",
+      image_url: imageUrl || null,
+      link_url: linkUrl || null,
+    })
+    .eq("id", id);
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/news");
+  return { success: true };
+}
+
+// 5. Delete Post
 export async function deleteNewsPost(id: string, facebookPostId?: string) {
   const supabase = await createClient();
 

@@ -4,9 +4,13 @@ import DangerZone from "@/components/user-profile/DangerZone";
 import Security from "@/components/user-profile/Security";
 import UserAddressCard from "@/components/user-profile/UserAddressCard";
 import UserMetaCard from "@/components/user-profile/UserMetaCard";
+import FormEmailSettings from "@/components/user-profile/FormEmailSettings";
+import UserManagement from "@/components/user-profile/UserManagement";
 import { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { getFormEmailSettings } from "@/app/actions/formEmails";
+import { listUsers } from "@/app/actions/users";
 
 export const metadata: Metadata = {
   title: "Profile | TailAdmin - Next.js Admin Dashboard Template",
@@ -52,6 +56,13 @@ export default async function Profile() {
     rawAppMetadata: appMetadata,
   };
 
+  // profiles.role is the authoritative role source (same one the (admin)
+  // middleware checks), not the auth app_metadata claim above.
+  const isSuperAdmin = profile?.role === "super_admin";
+  const [formEmailSettings, userList] = isSuperAdmin
+    ? await Promise.all([getFormEmailSettings(), listUsers()])
+    : [null, null];
+
   // 4. Server Action for Sign Out
   async function handleSignOut() {
     'use server';
@@ -71,6 +82,15 @@ export default async function Profile() {
           <UserMetaCard user={user} profile={profile} claims={claims} />
           {/* <UserAddressCard user={user} profile={profile} claims={claims} /> */}
           <Security user={user} profile={profile} claims={claims} />
+          {isSuperAdmin && userList?.success && (
+            <UserManagement users={userList.data} />
+          )}
+          {isSuperAdmin && formEmailSettings?.success && (
+            <FormEmailSettings
+              settings={formEmailSettings.data}
+              users={userList?.success ? userList.data : []}
+            />
+          )}
           <DangerZone user={user} profile={profile} claims={claims} onSignOut={handleSignOut} />
         </div>
       </div>

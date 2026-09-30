@@ -57,9 +57,27 @@ export async function verifyAndSaveProfile(formData: FormData, otpCode: string, 
   const firstName = (formData.get("firstName") as string) || "";
   const lastName = (formData.get("lastName") as string) || "";
   const phone = (formData.get("phone") as string) || "";
-  const bio = (formData.get("bio") as string) || "manager";
+  const requestedRole = formData.get("bio") as string | null;
   const finalAvatarUrl = avatarUrl || user.user_metadata?.avatar_url || "";
   const fullName = `${firstName} ${lastName}`.trim();
+
+  // Only a super_admin may change a role, and only to one of the known
+  // roles. Everyone else keeps whatever role they already have, regardless
+  // of what the submitted form contains — the UI hides the role selector
+  // for non-super-admins, but this is the actual enforcement point, since a
+  // form field can be edited or submitted directly by anyone.
+  const VALID_ROLES = ["manager", "director", "super_admin"];
+  const { data: currentProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const currentRole = currentProfile?.role || "manager";
+  const role =
+    currentRole === "super_admin" && requestedRole && VALID_ROLES.includes(requestedRole)
+      ? requestedRole
+      : currentRole;
 
   // 3. Verify the OTP code sent to user's email
   const { error: verifyError } = await supabase.auth.verifyOtp({
@@ -94,8 +112,7 @@ export async function verifyAndSaveProfile(formData: FormData, otpCode: string, 
     first_name: firstName,
     last_name: lastName,
     full_name: fullName,
-    // phone_number: phone,
-    role: bio,
+    role,
     avatar_url: finalAvatarUrl,
     updated_at: new Date().toISOString(),
   });

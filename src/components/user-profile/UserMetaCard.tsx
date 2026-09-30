@@ -42,6 +42,10 @@ interface UserMetaCardProps {
 }
 
 export default function UserMetaCard({ user, profile, claims }: UserMetaCardProps) {
+  // profiles.role is the authoritative role (the server action re-checks
+  // this too — a non-super-admin cannot change their role even by editing
+  // the submitted form directly).
+  const isSuperAdmin = profile?.role === "super_admin";
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -377,19 +381,21 @@ const handleSelectChange = (value: string) => {
                     <Input type="text" name="phone" defaultValue={phone} readOnly={showOtpInput} />
                   </div>
 
-                  <div className="col-span-2 lg:col-span-1">
-                    <div>
-                      <Label>Select User Role</Label>
-                      <input type="hidden" name="bio" value={selectedRole} />
-                      <Select
-                        options={options}
-                        placeholder="Select Option"
-                        onChange={handleSelectChange}
-                        defaultValue={selectedRole}
-                        className="dark:bg-dark-900"
-                      />
+                  {isSuperAdmin && (
+                    <div className="col-span-2 lg:col-span-1">
+                      <div>
+                        <Label>Select User Role</Label>
+                        <input type="hidden" name="bio" value={selectedRole} />
+                        <Select
+                          options={options}
+                          placeholder="Select Option"
+                          onChange={handleSelectChange}
+                          defaultValue={selectedRole}
+                          className="dark:bg-dark-900"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
