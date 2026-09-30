@@ -19,7 +19,7 @@ export default function DefaultInputs() {
   };
 
   return (
-    <ComponentCard title="Default Inputs">
+    <ComponentCard title="Default Inputs" className="bg-gray-300 shadow-theme-xs">
       <div className="space-y-6">
         <div>
           <Label htmlFor="test">Input</Label>

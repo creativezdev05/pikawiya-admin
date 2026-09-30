@@ -20,7 +20,7 @@ export default function InputGroup() {
   };
 
   return (
-    <ComponentCard title="Input Group">
+    <ComponentCard title="Input Group" className="bg-gray-300 shadow-theme-xs">
       <div className="space-y-6">
         <div>
           <Label htmlFor="email">Email</Label>

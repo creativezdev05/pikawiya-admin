@@ -100,7 +100,7 @@ export default function DropzoneComponent() {
   };
 
   return (
-    <ComponentCard title="Dropzone">
+    <ComponentCard title="Dropzone" className="bg-gray-300 shadow-theme-xs">
       <div>
         <div
           {...getRootProps()}

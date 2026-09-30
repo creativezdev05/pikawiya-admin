@@ -8,7 +8,7 @@ export default function TextAreaInput() {
   const [message, setMessage] = useState("");
   const [messageTwo, setMessageTwo] = useState("");
   return (
-    <ComponentCard title="Textarea input field">
+    <ComponentCard title="Textarea input field" className="bg-gray-300 shadow-theme-xs">
       <div className="space-y-6">
         {/* Default TextArea */}
         <div>

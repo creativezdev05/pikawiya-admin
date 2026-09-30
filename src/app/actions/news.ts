@@ -14,6 +14,11 @@ interface FacebookPost {
   created_time: string;
 }
 
+// Only one post is shown as the website popup at a time.
+async function deactivateAllPosts(supabase: Awaited<ReturnType<typeof createClient>>) {
+  await supabase.from("news_posts").update({ is_active: false }).eq("is_active", true);
+}
+
 // 1. Fetch Posts directly from Facebook Page API
 export async function fetchFacebookPosts() {
   try {
@@ -32,30 +37,44 @@ export async function fetchFacebookPosts() {
 }
 
 // 2. Sync Facebook Posts into Supabase
-export async function syncFacebookToSupabase(formData?: FormData): Promise<void> {
-  const { success, data: fbPosts } = await fetchFacebookPosts();
-  if (!success) return;
+export async function syncFacebookToSupabase(): Promise<{
+  success: boolean;
+  error?: string;
+  count?: number;
+}> {
+  const { success, data: fbPosts, error: fetchError } = await fetchFacebookPosts();
+  if (!success) {
+    return { success: false, error: fetchError ?? "Failed to fetch posts from Facebook." };
+  }
 
   const supabase = await createClient();
 
-  const formattedPosts = fbPosts.map((post: FacebookPost) => ({
+  const sortedPosts = [...fbPosts].sort(
+    (a, b) => new Date(b.created_time).getTime() - new Date(a.created_time).getTime()
+  );
+
+  const formattedPosts = sortedPosts.map((post: FacebookPost, index: number) => ({
     facebook_post_id: post.id,
     title: post.message ? post.message.substring(0, 60) + "..." : "Facebook Post",
     content: post.message || "",
     image_url: post.full_picture || null,
     link_url: post.permalink_url || null,
     published_at: post.created_time,
-    is_active: true,
+    is_active: index === 0, // latest post is the default active popup
   }));
+
+  if (formattedPosts.length > 0) {
+    await deactivateAllPosts(supabase);
+  }
 
   const { error: upsertError } = await supabase
     .from("news_posts")
     .upsert(formattedPosts, { onConflict: "facebook_post_id" });
 
-  if (upsertError) return;
+  if (upsertError) return { success: false, error: upsertError.message };
 
   revalidatePath("/news");
-  return;
+  return { success: true, count: formattedPosts.length };
 }
 
 // 3. Create and Publish Post (Handles BOTH, WEBSITE_ONLY, FACEBOOK_ONLY)
@@ -125,6 +144,8 @@ export async function createAndPublishPost(formData: FormData) {
 
   // --- Step B: Save to Supabase (If target is BOTH or WEBSITE_ONLY) ---
   if (target === "BOTH" || target === "WEBSITE_ONLY") {
+    await deactivateAllPosts(supabase);
+
     const { error: dbError } = await supabase.from("news_posts").insert({
       facebook_post_id: facebookPostId, // null if WEBSITE_ONLY
       title: title || "Community Update",
@@ -191,6 +212,25 @@ export async function deleteNewsPost(id: string, facebookPostId?: string) {
 
   // Delete from Supabase
   const { error } = await supabase.from("news_posts").delete().eq("id", id);
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/news");
+  return { success: true };
+}
+
+// 6. Set which post is shown as the active website popup (only one at a time)
+export async function setNewsPostActive(id: string, isActive: boolean) {
+  const supabase = await createClient();
+
+  if (isActive) {
+    await deactivateAllPosts(supabase);
+  }
+
+  const { error } = await supabase
+    .from("news_posts")
+    .update({ is_active: isActive })
+    .eq("id", id);
+
   if (error) return { success: false, error: error.message };
 
   revalidatePath("/news");

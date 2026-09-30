@@ -12,7 +12,7 @@ export default function FileInputExample() {
   };
 
   return (
-    <ComponentCard title="File Input">
+    <ComponentCard title="File Input" className="bg-gray-300 shadow-theme-xs">
       <div>
         <Label>Upload file</Label>
         <FileInput onChange={handleFileChange} className="custom-class" />

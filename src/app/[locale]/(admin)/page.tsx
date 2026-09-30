@@ -69,7 +69,7 @@ async function Forms() {
         ) : (
           <>
             <PageBreadcrumb pageTitle="Submitted Forms" />
-            <div className="space-y-6">
+            <div className="space-y-6 ">
               <ComponentCard title="Submitted Forms">
                 <BasicTableOne data={decryptedSubmissions} />
               </ComponentCard>

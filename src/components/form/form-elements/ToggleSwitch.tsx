@@ -7,7 +7,7 @@ export default function ToggleSwitch() {
     console.log("Switch is now:", checked ? "ON" : "OFF");
   };
   return (
-    <ComponentCard title="Toggle switch input">
+    <ComponentCard title="Toggle switch input" className="bg-gray-300 shadow-theme-xs">
       <div className="flex gap-4">
         <Switch
           label="Default"

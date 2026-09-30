@@ -195,7 +195,7 @@ export default function BasicTableOne({ data }: DynamicTableProps) {
   return (
     <>
       {/* Toolbar: Search + Type Filter */}
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ">
         <div className="relative w-full sm:max-w-xs">
           <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -225,7 +225,7 @@ export default function BasicTableOne({ data }: DynamicTableProps) {
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+      <div className="overflow-hidden rounded-xl border border-gray-200  dark:border-white/5 dark:bg-white/3">
         <div className="max-w-full overflow-x-auto">
           <Table>
             {/* Table Header */}
