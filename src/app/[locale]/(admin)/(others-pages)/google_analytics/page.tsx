@@ -41,7 +41,7 @@ export default async function AnalyticsAdminPage() {
     trafficSources,
     formSubmissions,
     deviceBreakdown,
-    countryBreakdown,
+    cityBreakdown,
     newVsReturning,
     landingPages,
     allEvents,
@@ -53,52 +53,55 @@ export default async function AnalyticsAdminPage() {
     description: string;
     icon: React.ReactNode;
     trend?: "up" | "down";
+    tone?: "brand" | "success" | "error";
   }[] = [
     {
       name: "Active Users (30d)",
       value: summary.activeUsers.toLocaleString(),
       description: "Unique visitors who used your site in the last 30 days.",
-      icon: <GroupIcon className="size-5 text-gray-800 dark:text-white/90" />,
+      icon: <GroupIcon className="size-5 text-brand-600 dark:text-brand-400" />,
     },
     {
       name: "Page Views (30d)",
       value: summary.pageViews.toLocaleString(),
       description: "Total pages loaded across all visitor sessions.",
-      icon: <EyeIcon className="size-5 text-gray-800 dark:text-white/90" />,
+      icon: <EyeIcon className="size-5 text-brand-600 dark:text-brand-400" />,
     },
     {
       name: "Total Sessions",
       value: summary.sessions.toLocaleString(),
       description: "Total visits, including repeat visits from the same user.",
-      icon: <BoltIcon className="size-5 text-gray-800 dark:text-white/90" />,
+      icon: <BoltIcon className="size-5 text-brand-600 dark:text-brand-400" />,
     },
     {
       name: "Avg. Session Duration",
       value: (summary.avgSessionDuration / 60).toFixed(1) + " min",
       description: "Average time a visitor spends per session.",
-      icon: <TimeIcon className="size-5 text-gray-800 dark:text-white/90" />,
+      icon: <TimeIcon className="size-5 text-brand-600 dark:text-brand-400" />,
     },
     {
       name: "New Users (30d)",
       value: summary.newUsers.toLocaleString(),
       description: "First-time visitors with no prior recorded session.",
-      icon: <UserIcon className="size-5 text-gray-800 dark:text-white/90" />,
+      icon: <UserIcon className="size-5 text-brand-600 dark:text-brand-400" />,
     },
     {
       name: "Bounce Rate",
       value: summary.bounceRate.toFixed(1) + "%",
       description:
         "Sessions that left without further interaction. Lower is better.",
-      icon: <ArrowDownIcon className="size-5 text-gray-800 dark:text-white/90" />,
+      icon: <ArrowDownIcon className="size-5 text-error-600 dark:text-error-400" />,
       trend: "down",
+      tone: "error",
     },
     {
       name: "Engagement Rate",
       value: summary.engagementRate.toFixed(1) + "%",
       description:
         "Sessions with meaningful interaction. Higher is better.",
-      icon: <ArrowUpIcon className="size-5 text-gray-800 dark:text-white/90" />,
+      icon: <ArrowUpIcon className="size-5 text-success-600 dark:text-success-400" />,
       trend: "up",
+      tone: "success",
     },
   ];
 
@@ -130,6 +133,7 @@ export default async function AnalyticsAdminPage() {
               description={stat.description}
               icon={stat.icon}
               trend={stat.trend}
+              tone={stat.tone}
             />
           ))}
         </div>
@@ -150,7 +154,7 @@ export default async function AnalyticsAdminPage() {
           dailyTrend={dailyTrend}
           trafficSources={trafficSources}
           deviceBreakdown={deviceBreakdown}
-          countryBreakdown={countryBreakdown}
+          cityBreakdown={cityBreakdown}
         />
       </div>
 
@@ -208,7 +212,6 @@ export default async function AnalyticsAdminPage() {
           <ComponentCard
             title="Most Viewed Pages"
             desc="Pages ranked by total pageviews in the last 30 days your most-consumed content."
-            className="bg-gray-300 shadow-theme-xs"
           >
             <div className="overflow-x-auto">
               <table className="w-full text-start text-sm text-gray-500 dark:text-gray-400">
@@ -240,7 +243,6 @@ export default async function AnalyticsAdminPage() {
           <ComponentCard
             title="Top Landing Pages"
             desc="Pages where sessions most often began the first thing visitors see, key for first impressions and SEO landing performance."
-            className="bg-gray-300 shadow-theme-xs"
           >
             <div className="overflow-x-auto">
               <table className="w-full text-start text-sm text-gray-500 dark:text-gray-400">

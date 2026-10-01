@@ -203,11 +203,11 @@
 }
 
 @utility menu-item-inactive {
-  @apply text-gray-700 group-hover:text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300;
+  @apply text-white group-hover:text-gray-100 hover:bg-white/5 hover:text-gray-100;
 }
 
 @utility menu-item-icon {
-  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400;
+  @apply text-gray-400 group-hover:text-gray-200;
 }
 
 @utility menu-item-icon-active {
@@ -215,7 +215,7 @@
 }
 
 @utility menu-item-icon-inactive {
-  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
+  @apply text-gray-400 group-hover:text-gray-200;
 }
 
 @utility menu-item-arrow {
@@ -227,7 +227,7 @@
 }
 
 @utility menu-item-arrow-inactive {
-  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
+  @apply text-gray-400 group-hover:text-gray-200;
 }
 
 @utility menu-dropdown-item {
@@ -239,7 +239,7 @@
 }
 
 @utility menu-dropdown-item-inactive {
-  @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
+  @apply text-gray-300 hover:bg-white/5 hover:text-gray-100;
 }
 
 @utility menu-dropdown-badge {
@@ -796,7 +796,7 @@ pre[class*="language-"].line-numbers {
 }
 
 @utility docs-menu-item-active {
-  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+  @apply bg-brand-50 text-brand-500 dark:bg-gray-900 dark:text-brand-400;
 }
 
 @utility docs-menu-item-inactive {
@@ -1150,5 +1150,44 @@ pre[class*="language-"].line-numbers {
 @media (max-width: 640px) {
   .custom-calendar .fc-timegrid {
     min-width: 580px;
+  }
+}
+
+/* Auth footer floating brand mark, mirrors the marketing site's transparent logo */
+.tr-logo {
+  position: absolute;
+  top: 1.75rem;
+  inset-inline-start: 9rem;
+  z-index: 1;
+  width: clamp(100px, 12vw, 150px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  opacity: 0.12;
+}
+
+.tr-logo--float {
+  animation: tr-logo-float 7s ease-in-out infinite;
+}
+
+@keyframes tr-logo-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+@media (max-width: 640px) {
+  .tr-logo {
+    width: 80px;
+    opacity: 0.1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tr-logo--float {
+    animation: none;
   }
 }

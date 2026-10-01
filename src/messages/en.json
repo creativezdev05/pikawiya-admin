@@ -193,6 +193,28 @@
     "termsError": "You must accept the Terms and Conditions to proceed.",
     "successMsg": "Registration successful! Please check your email to confirm your account."
   },
+  "authLayout": {
+    "header": {
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
+    },
+    "footer": {
+      "brandName": "Pika Wiya Health Service",
+      "about": "Providing culturally safe healthcare and community wellbeing services across Port Augusta and surrounding regions.",
+      "quickLinks": "Quick Links",
+      "home": "Home",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfUse": "Terms of Use",
+      "contactTitle": "Contact & Location",
+      "aboriginalFlagAlt": "Aboriginal Flag",
+      "torresStraitFlagAlt": "Torres Strait Islander Flag",
+      "address": "40-46 Dartford St, Port Augusta SA 5700",
+      "phone": "(08) 8642 9900",
+      "email": "admin@pikawiyahealth.org.au",
+      "rightsReserved": "Pika Wiya Health Service Aboriginal Corporation. All rights reserved.",
+      "builtBy": "Built by Redbanks Technologies"
+    }
+  },
   "userDropdown": {
     "editProfile": "Edit profile",
     "accountSettings": "Account settings",

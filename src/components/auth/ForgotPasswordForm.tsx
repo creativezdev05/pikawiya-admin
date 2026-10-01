@@ -51,18 +51,15 @@ export default function ForgotPasswordForm() {
   };
 
   return (
-    <div className="no-scrollbar flex w-full flex-1 flex-col overflow-y-auto lg:w-1/2">
-      <div className="mx-auto mb-5 w-full max-w-md sm:pt-10">
-        <Link
-          href="/signin"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-        >
-          <ChevronLeftIcon className="rtl:rotate-180" />
-          {t("backToSignIn", { fallback: "Back to Sign In" })}
-        </Link>
-      </div>
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
-        <div>
+    <div className="w-full max-w-md rounded-2xl border border-gray-400 bg-white p-6 shadow-theme-xl dark:border-gray-700 dark:bg-white/3 sm:p-8">
+      <Link
+        href="/signin"
+        className="mb-6 inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+      >
+        <ChevronLeftIcon className="rtl:rotate-180" />
+        {t("backToSignIn", { fallback: "Back to Sign In" })}
+      </Link>
+      <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 text-title-sm font-semibold text-gray-800 sm:text-title-md dark:text-white/90">
               {t("title", { fallback: "Forgot Password?" })}
@@ -118,7 +115,6 @@ export default function ForgotPasswordForm() {
               </div>
             </div>
           </form>
-        </div>
       </div>
     </div>
   );

@@ -45,12 +45,12 @@ const AppHeader: React.FC = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 flex w-full border-gray-200 bg-white xl:border-b dark:border-gray-800 dark:bg-gray-900">
+    <header className="sticky top-0 z-50 flex w-full border-gray-800 bg-gray-900 xl:border-b dark:border-gray-800 dark:bg-gray-900">
       <div className="flex grow flex-col items-center justify-between xl:flex-row xl:px-6">
-        <div className="flex w-full items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:gap-4 xl:justify-normal xl:border-b-0 xl:px-0 xl:py-4 dark:border-gray-800">
+        <div className="flex w-full items-center justify-between gap-2 border-b border-gray-800 px-3 py-3 sm:gap-4 xl:justify-normal xl:border-b-0 xl:px-0 xl:py-4 dark:border-gray-800">
           <button
-            className={`z-50 flex h-10 w-10 items-center justify-center rounded-lg border-gray-200 text-gray-500 lg:h-11 lg:w-11 lg:bg-transparent xl:border dark:border-gray-800 dark:text-gray-400 dark:lg:bg-transparent ${
-              isMobileOpen ? "bg-gray-100 dark:bg-white/3" : ""
+            className={`z-50 flex h-10 w-10 items-center justify-center rounded-lg border-gray-700 text-gray-300 lg:h-11 lg:w-11 lg:bg-transparent xl:border dark:border-gray-800 dark:text-gray-400 dark:lg:bg-transparent ${
+              isMobileOpen ? "bg-white/5 dark:bg-white/3" : ""
             }`}
             onClick={handleToggle}
             aria-label={t("toggleSidebar")}
@@ -94,14 +94,6 @@ const AppHeader: React.FC = () => {
             <Image
               width={154}
               height={32}
-              className="dark:hidden"
-              src="/images/logo/logo.svg"
-              alt="Logo"
-            />
-            <Image
-              width={154}
-              height={32}
-              className="hidden dark:block"
               src="/images/logo/logo-dark.svg"
               alt="Logo"
             />
@@ -109,7 +101,7 @@ const AppHeader: React.FC = () => {
 
           <button
             onClick={toggleApplicationMenu}
-            className="z-99999 flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100 xl:hidden dark:text-gray-400 dark:hover:bg-gray-800"
+            className="z-99999 flex h-10 w-10 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-800 xl:hidden"
           >
             <svg
               width="24"

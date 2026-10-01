@@ -143,10 +143,10 @@ async function fetchAnalyticsSummary() {
             limit: 5,
             orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
           },
-          // 7. Country Breakdown
+          // 7. City Breakdown
           {
             dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-            dimensions: [{ name: "country" }],
+            dimensions: [{ name: "city" }],
             metrics: [{ name: "activeUsers" }],
             limit: 5,
             orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
@@ -241,9 +241,9 @@ async function fetchAnalyticsSummary() {
       users: Number(row.metricValues?.[0]?.value || 0),
     }));
 
-    // Parse Country Breakdown (Batch 2, Request 1)
-    const countryBreakdown = (reports2[1]?.rows || []).map((row) => ({
-      country: row.dimensionValues?.[0]?.value || "(not set)",
+    // Parse City Breakdown (Batch 2, Request 1)
+    const cityBreakdown = (reports2[1]?.rows || []).map((row) => ({
+      city: row.dimensionValues?.[0]?.value || "(not set)",
       users: Number(row.metricValues?.[0]?.value || 0),
     }));
 
@@ -273,7 +273,7 @@ async function fetchAnalyticsSummary() {
       trafficSources,
       formSubmissions,
       deviceBreakdown,
-      countryBreakdown,
+      cityBreakdown,
       newVsReturning,
       landingPages,
       allEvents,

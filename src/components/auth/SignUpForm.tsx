@@ -102,11 +102,8 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="no-scrollbar flex w-full flex-1 flex-col overflow-y-auto lg:w-1/2">
-      <div className="mx-auto mb-5 w-full max-w-md sm:pt-10">
-      </div>
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
-        <div>
+    <div className="w-full max-w-md rounded-2xl border border-gray-400 bg-white p-6 shadow-theme-xl dark:border-gray-700 dark:bg-white/3 sm:p-8">
+      <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 text-title-sm font-semibold text-gray-800 sm:text-title-md dark:text-white/90">
               {t("title", { fallback: "Sign Up" })}
@@ -261,7 +258,6 @@ export default function SignUpForm() {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

@@ -1,44 +1,50 @@
-import GridShape from "@/components/common/GridShape";
-import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
-
+import AuthFooter from "@/components/auth/AuthFooter";
+import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemeProvider } from "@/context/ThemeContext";
-import Image from "next/image";
-import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
   return (
-    <div className="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
-      <ThemeProvider>
-        <div className="relative flex lg:flex-row w-full h-screen justify-center flex-col  dark:bg-gray-900 sm:p-0">
-          {children}
-          <div className="lg:w-1/2 w-full h-full bg-brand-950 dark:bg-white/5 lg:grid items-center hidden">
-            <div className="relative items-center justify-center  flex z-1">
-              {/* <!-- ===== Common Grid Shape Start ===== --> */}
-              <GridShape />
-              <div className="flex flex-col items-center max-w-xs">
-                <Link href="/" className="block mb-4">
-                  <Image
-                    width={231}
-                    height={48}
-                    src="/images/logo/logo-pikawiya.png"
-                    alt="Logo"
-                  />
-                </Link>
-                <p className="text-center text-gray-400 dark:text-white/60">
-                  Health Service
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="fixed bottom-6 right-6 z-50 hidden sm:block">
-          </div>
+    <ThemeProvider>
+      <div className="relative flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
+        {/* Light-theme page background: fixed image + drifting line pattern, hidden in dark mode */}
+        <div
+          className="fixed inset-0 z-0 pointer-events-none transition-all duration-300 ease-in-out dark:hidden"
+          aria-hidden="true"
+        >
+          <Image
+            src="/images/background/admin-bg.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div
+            className="absolute inset-0 animate-drift opacity-15"
+            style={{
+              backgroundImage: "url('/images/background/admin-bg-pattern.png')",
+              backgroundSize: "contain",
+              filter:
+                "brightness(0) saturate(100%) invert(96%) sepia(94%) saturate(122%) hue-rotate(32deg) brightness(116%) contrast(98%)",
+            }}
+          />
         </div>
-      </ThemeProvider>
-    </div>
+
+        <div className="relative z-10 flex min-h-screen flex-col">
+          <AuthHeader />
+          <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+            {children}
+          </main>
+          <AuthFooter />
+        </div>
+      </div>
+    </ThemeProvider>
   );
 }

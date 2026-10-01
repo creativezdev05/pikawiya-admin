@@ -21,7 +21,7 @@ export default function BreakdownCard({
   const totalCount = items.reduce((sum, item) => sum + item.count, 0);
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-300 p-5 shadow-theme-xs dark:border-white/5 dark:bg-white/5">
+    <div className="rounded-2xl border border-gray-400 bg-white p-5 shadow-theme-xl dark:border-gray-700 dark:bg-white/3">
       <div className="mb-4">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">
           {title}

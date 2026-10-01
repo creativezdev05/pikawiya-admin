@@ -4,7 +4,6 @@ import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
 import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
 import RecentOrders from "@/components/ecommerce/RecentOrders";
 import StatisticsChart from "@/components/ecommerce/StatisticsChart";
-import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import BasicTableOne from "@/components/tables/BasicTableOne";
 import type { Metadata } from "next";
@@ -61,18 +60,21 @@ async function Forms() {
   return (
     <div>
         {submissionsError ? (
-          <p className="text-sm text-destructive">
+          <p className="text-sm text-error-500">
             Error loading submissions: {submissionsError.message}
           </p>
         ) : decryptedSubmissions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No submissions found.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">No submissions found.</p>
         ) : (
           <>
             <PageBreadcrumb pageTitle="Submitted Forms" />
             <div className="space-y-6 ">
-              <ComponentCard title="Submitted Forms">
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xl dark:border-gray-800 dark:bg-white/3 sm:p-6">
+                <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+                  Submitted Forms
+                </h3>
                 <BasicTableOne data={decryptedSubmissions} />
-              </ComponentCard>
+              </div>
             </div>
           </>
         )}

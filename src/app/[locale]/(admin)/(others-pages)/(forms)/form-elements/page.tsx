@@ -21,20 +21,22 @@ export default function FormElements() {
   return (
     <div>
       <PageBreadcrumb pageTitle="Form Elements" />
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <div className="space-y-6">
-          <DefaultInputs />
-          <SelectInputs />
-          <TextAreaInput />
-          <InputStates />
-        </div>
-        <div className="space-y-6">
-          <InputGroup />
-          <FileInputExample />
-          <CheckboxComponents />
-          <RadioButtons />
-          <ToggleSwitch />
-          <DropzoneComponent />
+      <div className="rounded-2xl border border-gray-400 bg-white p-4 shadow-theme-xl sm:p-6 dark:border-gray-700 dark:bg-white/3">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <div className="space-y-6">
+            <DefaultInputs />
+            <SelectInputs />
+            <TextAreaInput />
+            <InputStates />
+          </div>
+          <div className="space-y-6">
+            <InputGroup />
+            <FileInputExample />
+            <CheckboxComponents />
+            <RadioButtons />
+            <ToggleSwitch />
+            <DropzoneComponent />
+          </div>
         </div>
       </div>
     </div>

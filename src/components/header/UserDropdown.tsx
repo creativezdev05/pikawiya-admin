@@ -118,7 +118,7 @@ export default function UserDropdown() {
     <div className="relative">
       <button
         onClick={toggleDropdown}
-        className="dropdown-toggle flex items-center text-gray-700 dark:text-gray-400"
+        className="dropdown-toggle flex items-center text-gray-300 hover:text-white"
       >
         <span className="me-3 h-11 w-11 overflow-hidden rounded-full">
           <Image
@@ -132,7 +132,7 @@ export default function UserDropdown() {
         <span className="me-1 block text-theme-sm font-medium">{user.user_metadata.full_name}</span>
 
         <ChevronDownIcon
-          className={`size-5 text-gray-500 transition-transform duration-200 dark:text-gray-400 ${
+          className={`size-5 text-gray-400 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
         />

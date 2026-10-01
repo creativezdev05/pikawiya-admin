@@ -17,7 +17,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3",
+        "rounded-2xl border border-gray-400 bg-white shadow-theme-xl dark:border-gray-700 dark:bg-white/3",
         className,
       )}
     >

@@ -9,14 +9,14 @@ interface AnalyticsChartsProps {
   dailyTrend: { date: string; Users: number; Views: number }[];
   trafficSources: { source: string; sessions: number }[];
   deviceBreakdown: { device: string; users: number }[];
-  countryBreakdown: { country: string; users: number }[];
+  cityBreakdown: { city: string; users: number }[];
 }
 
 export default function AnalyticsCharts({
   dailyTrend,
   trafficSources,
   deviceBreakdown,
-  countryBreakdown,
+  cityBreakdown,
 }: AnalyticsChartsProps) {
   // 1. Transform dailyTrend -> ApexCharts format (Line Chart)
   const lineCategories = dailyTrend.map((item) => item.date);
@@ -49,12 +49,12 @@ export default function AnalyticsCharts({
     },
   ];
 
-  // 4. Transform countryBreakdown -> ApexCharts format (Bar Chart)
-  const countryCategories = countryBreakdown.map((item) => item.country);
-  const countrySeries = [
+  // 4. Transform cityBreakdown -> ApexCharts format (Bar Chart)
+  const cityCategories = cityBreakdown.map((item) => item.city);
+  const citySeries = [
     {
       name: "Users",
-      data: countryBreakdown.map((item) => item.users),
+      data: cityBreakdown.map((item) => item.users),
     },
   ];
 
@@ -64,7 +64,7 @@ export default function AnalyticsCharts({
       <ComponentCard
         title="Traffic Over Time"
         desc="Daily active users compared with page views over the last 30 days spot growth trends, drops, or spikes tied to campaigns or new content."
-        className="lg:col-span-2 bg-gray-300 shadow-theme-xs"
+        className="lg:col-span-3"
       >
         <div className="h-72 w-full">
           <LineChartOne categories={lineCategories} series={lineSeries} />
@@ -75,7 +75,7 @@ export default function AnalyticsCharts({
       <ComponentCard
         title="Where Visitors Come From"
         desc="Sessions grouped by acquisition channel organic search, direct, referral, social, or paid showing which channels bring in the most traffic."
-        className="lg:col-span-3 bg-gray-300 shadow-theme-xs"
+        className="lg:col-span-3"
       >
         <div className="h-60 w-full">
           <BarChartOne categories={barCategories} series={barSeries} />
@@ -86,21 +86,20 @@ export default function AnalyticsCharts({
       <ComponentCard
         title="Users by Device"
         desc="Session share across desktop, mobile, and tablet use this to prioritize where responsive design and testing matter most."
-        className="bg-gray-300 shadow-theme-xs"
       >
         <div className="h-60 w-full">
           <BarChartOne categories={deviceCategories} series={deviceSeries} />
         </div>
       </ComponentCard>
 
-      {/* 4. Country Breakdown Bar Chart */}
+      {/* 4. City Breakdown Bar Chart */}
       <ComponentCard
-        title="Top Countries"
-        desc="Users grouped by country shows where your audience is geographically located."
-        className="lg:col-span-2 bg-gray-300 shadow-theme-xs"
+        title="Top Cities"
+        desc="Users grouped by city shows where your audience is geographically located."
+        className="lg:col-span-2"
       >
         <div className="h-60 w-full">
-          <BarChartOne categories={countryCategories} series={countrySeries} />
+          <BarChartOne categories={cityCategories} series={citySeries} />
         </div>
       </ComponentCard>
     </div>

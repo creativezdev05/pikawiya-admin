@@ -74,16 +74,16 @@ export default function NewsTable({ posts }: { posts: NewsPostDetail[] }) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-gray-300 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+      <div className="overflow-hidden rounded-2xl border border-gray-400 bg-white shadow-theme-xl dark:border-gray-700 dark:bg-white/3">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-800/50">
+          <table className="w-full text-start text-sm">
+            <thead className="border-b border-gray-700 bg-gray-900">
               <tr>
-                <th className="p-4">Post</th>
-                <th className="p-4">Link</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Published Date</th>
-                <th className="p-4 text-end">Actions</th>
+                <th className="p-4 text-white">Post</th>
+                <th className="p-4 text-white">Link</th>
+                <th className="p-4 text-white">Status</th>
+                <th className="p-4 text-white">Published Date</th>
+                <th className="p-4 text-end text-white">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -108,7 +108,7 @@ export default function NewsTable({ posts }: { posts: NewsPostDetail[] }) {
                           <p className="truncate font-semibold text-gray-800 dark:text-white">
                             {post.title}
                           </p>
-                          <p className="line-clamp-1 text-xs text-gray-500">{post.content}</p>
+                          <p className="line-clamp-1 text-xs text-gray-500 dark:text-gray-400">{post.content}</p>
                         </div>
                       </div>
                     </td>
@@ -133,7 +133,7 @@ export default function NewsTable({ posts }: { posts: NewsPostDetail[] }) {
                         isActive={post.is_active}
                       />
                     </td>
-                    <td className="p-4 text-xs text-gray-500">
+                    <td className="p-4 text-xs text-gray-500 dark:text-gray-400">
                       {new Date(post.published_at).toLocaleDateString()}
                     </td>
                     <td className="p-4 text-end">
@@ -156,7 +156,7 @@ export default function NewsTable({ posts }: { posts: NewsPostDetail[] }) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="p-6 text-center text-gray-500">
+                  <td colSpan={5} className="p-6 text-center text-gray-500 dark:text-gray-400">
                     {posts.length === 0
                       ? 'No posts found. Click "Sync from Facebook" to import your latest Facebook page posts.'
                       : "No posts match your search or filter."}

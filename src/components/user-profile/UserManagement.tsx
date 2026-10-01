@@ -99,7 +99,7 @@ export default function UserManagement({ users: initialUsers }: UserManagementPr
 
       <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-white/5">
         <div className="max-w-full overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-start">
             <thead className="border-b border-gray-100 bg-gray-50 dark:border-white/5 dark:bg-white/5">
               <tr>
                 <th className="p-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400">
@@ -128,7 +128,7 @@ export default function UserManagement({ users: initialUsers }: UserManagementPr
                       {user.role}
                     </Badge>
                   </td>
-                  <td className="p-3 text-right">
+                  <td className="p-3 text-end">
                     <button
                       onClick={() => handleEdit(user)}
                       className="text-theme-sm font-medium text-brand-500 hover:underline dark:text-brand-400"

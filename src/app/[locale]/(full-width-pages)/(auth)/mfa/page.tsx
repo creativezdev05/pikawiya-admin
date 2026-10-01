@@ -112,7 +112,7 @@ export default function MFAPage() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
-        <p className="text-sm text-muted-foreground animate-pulse">
+        <p className="animate-pulse text-sm text-gray-500 dark:text-gray-400">
           Checking security status...
         </p>
       </div>
@@ -121,15 +121,15 @@ export default function MFAPage() {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4">
-      <div className="w-full max-w-md p-6 bg-card border rounded-lg shadow-sm">
+      <div className="w-full max-w-md rounded-2xl border border-gray-400 bg-white p-6 shadow-theme-xl dark:border-gray-700 dark:bg-white/3 sm:p-8">
         {enrolledFactor ? (
           /* --- STATE A: OTP CHALLENGE (USER ALREADY HAS TOTP ENROLLED) --- */
           <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-xl font-bold tracking-tight">
+              <h1 className="text-title-sm font-semibold text-gray-800 sm:text-title-md dark:text-white/90">
                 Two-Factor Authentication
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Enter the 6-digit verification code from your authenticator app
                 to continue to the admin panel.
               </p>
@@ -145,14 +145,14 @@ export default function MFAPage() {
                   placeholder="123456"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full p-3 border rounded-md text-center text-2xl font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-center font-mono text-2xl tracking-widest text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90"
                   autoFocus
                   required
                 />
               </div>
 
               {error && (
-                <p className="text-xs text-destructive text-center font-medium">
+                <p className="text-center text-xs font-medium text-error-500">
                   {error}
                 </p>
               )}
@@ -160,7 +160,7 @@ export default function MFAPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-primary text-primary-foreground py-2.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                className="w-full rounded-lg bg-brand-500 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600 disabled:opacity-50"
               >
                 {submitting ? "Verifying..." : "Verify Code"}
               </button>
@@ -170,32 +170,32 @@ export default function MFAPage() {
           /* --- STATE B: TOTP ENROLLMENT (FIRST-TIME SETUP) --- */
           <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-xl font-bold tracking-tight">
+              <h1 className="text-title-sm font-semibold text-gray-800 sm:text-title-md dark:text-white/90">
                 Set Up Two-Factor Auth
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Super Administrators are required to enable MFA. Scan the QR code
                 below using Google Authenticator, 1Password, or Authy.
               </p>
             </div>
 
             {qrCode ? (
-              <div className="flex justify-center p-3 bg-white border rounded-md w-fit mx-auto">
+              <div className="mx-auto w-fit rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800">
                 <img
                   src={qrCode}
                   alt="MFA QR Code"
-                  className="w-44 h-44 object-contain"
+                  className="h-44 w-44 object-contain"
                 />
               </div>
             ) : (
-              <div className="w-44 h-44 bg-muted border rounded-md mx-auto flex items-center justify-center">
-                <p className="text-xs text-muted-foreground">Generating QR...</p>
+              <div className="mx-auto flex h-44 w-44 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-800">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Generating QR...</p>
               </div>
             )}
 
             <form onSubmit={handleVerify} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-muted-foreground text-center">
+                <label className="text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                   Enter 6-Digit Code to Confirm Setup
                 </label>
                 <input
@@ -206,13 +206,13 @@ export default function MFAPage() {
                   placeholder="000000"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full p-3 border rounded-md text-center text-2xl font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-center font-mono text-2xl tracking-widest text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90"
                   required
                 />
               </div>
 
               {error && (
-                <p className="text-xs text-destructive text-center font-medium">
+                <p className="text-center text-xs font-medium text-error-500">
                   {error}
                 </p>
               )}
@@ -220,7 +220,7 @@ export default function MFAPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-primary text-primary-foreground py-2.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                className="w-full rounded-lg bg-brand-500 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600 disabled:opacity-50"
               >
                 {submitting ? "Enrolling..." : "Activate & Continue"}
               </button>
