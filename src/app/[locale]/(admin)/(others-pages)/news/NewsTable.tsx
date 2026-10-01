@@ -128,7 +128,7 @@ export default function NewsTable({ posts }: { posts: NewsPostDetail[] }) {
                     </td>
                     <td className="p-4">
                       <ActivePopupToggle
-                        key={`${post.id}-${post.is_active}`}
+                        key={post.id}
                         id={post.id}
                         isActive={post.is_active}
                       />
