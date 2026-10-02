@@ -94,7 +94,7 @@ const AppHeader: React.FC = () => {
             <Image
               width={154}
               height={32}
-              src="/images/logo/logo-dark.svg"
+              src="/images/logo/pika_wiya_logo.png"
               alt="Logo"
             />
           </Link>
