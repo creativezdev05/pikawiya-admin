@@ -22,6 +22,7 @@ export interface FormRecord {
 
 interface DynamicTableProps {
   data: FormRecord[];
+  onTypeFilterChange?: (typeFilter: string) => void;
 }
 
 type SortKey = "form_type" | "created_at";
@@ -110,7 +111,7 @@ function SortIcon({ direction }: { direction: SortDirection | null }) {
   );
 }
 
-export default function BasicTableOne({ data }: DynamicTableProps) {
+export default function BasicTableOne({ data, onTypeFilterChange }: DynamicTableProps) {
   const [selectedRecord, setSelectedRecord] = useState<FormRecord | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -157,6 +158,10 @@ export default function BasicTableOne({ data }: DynamicTableProps) {
   useEffect(() => {
     setCurrentPage(1);
   }, [search, typeFilter, sortKey, sortDir]);
+
+  useEffect(() => {
+    onTypeFilterChange?.(typeFilter);
+  }, [typeFilter, onTypeFilterChange]);
 
   const totalPages = Math.max(1, Math.ceil(sortedData.length / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);

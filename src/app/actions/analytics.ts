@@ -158,12 +158,13 @@ async function fetchAnalyticsSummary() {
             metrics: [{ name: "activeUsers" }],
             orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
           },
-          // 9. Landing Pages
+          // 9. Landing Pages — fetch extra rows since "(not set)" entries
+          // get filtered out below, and we still want up to 5 real rows.
           {
             dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
             dimensions: [{ name: "landingPage" }],
             metrics: [{ name: "sessions" }],
-            limit: 5,
+            limit: 8,
             orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
           },
           // 10. All Events (diagnostic, unfiltered) — lets the dashboard
@@ -253,11 +254,16 @@ async function fetchAnalyticsSummary() {
       users: Number(row.metricValues?.[0]?.value || 0),
     }));
 
-    // Parse Landing Pages (Batch 2, Request 3)
-    const landingPages = (reports2[3]?.rows || []).map((row) => ({
-      path: row.dimensionValues?.[0]?.value || "/",
-      sessions: Number(row.metricValues?.[0]?.value || 0),
-    }));
+    // Parse Landing Pages (Batch 2, Request 3) — GA4 reports "(not set)" for
+    // sessions it can't attribute to a real page_view; drop those rather
+    // than showing a meaningless row in the dashboard.
+    const landingPages = (reports2[3]?.rows || [])
+      .filter((row) => row.dimensionValues?.[0]?.value !== "(not set)")
+      .slice(0, 5)
+      .map((row) => ({
+        path: row.dimensionValues?.[0]?.value || "/",
+        sessions: Number(row.metricValues?.[0]?.value || 0),
+      }));
 
     // Parse All Events — diagnostic list of every event GA4 received, so
     // forms firing under an unexpected event name are still visible.

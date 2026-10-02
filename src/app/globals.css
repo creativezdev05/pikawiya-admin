@@ -44,8 +44,8 @@
   --color-brand-200: #c2d9ff;
   --color-brand-300: #9cc1ff;
   --color-brand-400: #75a9ff;
-  --color-brand-500: #468bff;
-  --color-brand-600: #367ef5;
+  --color-brand-500: #E85D26;
+  --color-brand-600: #b83d0e;
   --color-brand-700: #2a6bd8;
   --color-brand-800: #2558ae;
   --color-brand-900: #264b89;
@@ -664,14 +664,14 @@ span.flatpickr-weekday,
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: #468bff;
+  background: #E85D26;
   @apply !border-brand-500 !bg-brand-500 hover:!border-brand-500 hover:!bg-brand-500;
 }
 
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
-  box-shadow: -10px 0 0 #468bff;
+  box-shadow: -10px 0 0 #E85D26;
 }
 
 .flatpickr-months .flatpickr-prev-month svg,
@@ -859,7 +859,7 @@ pre[class*="language-"].line-numbers {
   fill: #9cc1ff !important;
 }
 #mapTwo .jvectormap-region[data-code="US"] {
-  fill: #468bff !important;
+  fill: #E85D26 !important;
 }
 
 .api-token-chart .apexcharts-tooltip {
@@ -875,10 +875,10 @@ pre[class*="language-"].line-numbers {
   stroke-width: 2 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-CA"] {
-  fill: #468bff !important;
+  fill: #E85D26 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-NV"] {
-  fill: #468bff !important;
+  fill: #E85D26 !important;
 }
 #mapCustomerPinPoint .jvectormap-region[data-code="US-NY"] {
   fill: #356ecd !important;
@@ -917,7 +917,7 @@ pre[class*="language-"].line-numbers {
   fill: #9cc1ff !important;
 }
 #mapCustomerPinPoint .jvectormap-region.jvectormap-element:hover {
-  fill: #468bff !important;
+  fill: #E85D26 !important;
 }
 .dark #mapCustomerPinPoint .jvectormap-region.jvectormap-element {
   stroke: #1f2937 !important;
@@ -925,7 +925,7 @@ pre[class*="language-"].line-numbers {
 
 /* Customer map markers: solid filled circles with white ring */
 #mapCustomerPinPoint .jvectormap-marker.jvectormap-element {
-  fill: #468bff !important;
+  fill: #E85D26 !important;
   stroke: white !important;
   stroke-width: 2 !important;
   fill-opacity: 1 !important;
@@ -945,7 +945,7 @@ pre[class*="language-"].line-numbers {
   height: 20px;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #468bff;
+  border: 2px solid #E85D26;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
@@ -954,7 +954,7 @@ pre[class*="language-"].line-numbers {
   height: 20px;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #468bff;
+  border: 2px solid #E85D26;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }

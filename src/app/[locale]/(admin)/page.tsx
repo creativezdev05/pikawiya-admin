@@ -5,7 +5,7 @@ import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
 import RecentOrders from "@/components/ecommerce/RecentOrders";
 import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import BasicTableOne from "@/components/tables/BasicTableOne";
+import SubmittedFormsCard from "@/components/tables/SubmittedFormsCard";
 import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -14,8 +14,8 @@ import { decryptFormPayload } from "@/utils/formCrypto";
 
 export const metadata: Metadata = {
   title:
-    "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
+    "Pika Wiya Health Service",
+  description: "This is Pika Wiya Health Service admin dashboard for managing the health service",
 };
 async function Forms() {
   const supabase = await createClient();
@@ -69,12 +69,7 @@ async function Forms() {
           <>
             <PageBreadcrumb pageTitle="Submitted Forms" />
             <div className="space-y-6 ">
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xl dark:border-gray-800 dark:bg-white/3 sm:p-6">
-                <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
-                  Submitted Forms
-                </h3>
-                <BasicTableOne data={decryptedSubmissions} />
-              </div>
+              <SubmittedFormsCard data={decryptedSubmissions} />
             </div>
           </>
         )}

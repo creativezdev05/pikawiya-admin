@@ -31,7 +31,7 @@ export default function SyncFacebookButton() {
           type="submit"
           disabled={isPending}
           aria-busy={isPending}
-          className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:blur-[1px]"
+          className="rounded-lg px-4 py-2.5 text-sm font-medium bg-brand-500 text-white hover:bg-brand-600  disabled:cursor-not-allowed disabled:opacity-50 disabled:blur-[1px]"
         >
           {isPending ? "Syncing..." : "Sync from Facebook"}
         </button>
