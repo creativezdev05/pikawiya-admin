@@ -228,7 +228,7 @@ export default async function AnalyticsAdminPage() {
                       className="border-b border-gray-100 hover:bg-gray-100 dark:border-gray-800/50 dark:hover:bg-white/5"
                     >
                       <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
-                        {page.path}
+                        {page.path === "/" ? "Home" : "Home" + page.path}
                       </td>
                       <td className="py-3 px-4 text-end font-semibold text-gray-800 dark:text-white">
                         {page.views.toLocaleString()}
@@ -259,7 +259,7 @@ export default async function AnalyticsAdminPage() {
                       className="border-b border-gray-100 hover:bg-gray-100 dark:border-gray-800/50 dark:hover:bg-white/5"
                     >
                       <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
-                        {page.path}
+                        {page.path === "/" ? "Home" : "Home" + page.path}
                       </td>
                       <td className="py-3 px-4 text-end font-semibold text-gray-800 dark:text-white">
                         {page.sessions.toLocaleString()}

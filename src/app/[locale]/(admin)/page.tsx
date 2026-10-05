@@ -14,7 +14,7 @@ import { decryptFormPayload } from "@/utils/formCrypto";
 
 export const metadata: Metadata = {
   title:
-    "Pika Wiya Health Service",
+    "Pika Wiya Health Service Submitted Forms | Pika Wiya Health Service Admin Dashboard",
   description: "This is Pika Wiya Health Service admin dashboard for managing the health service",
 };
 async function Forms() {
